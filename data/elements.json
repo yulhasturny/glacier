@@ -1,0 +1,74 @@
+[
+  {
+    "id": "rhone",
+    "title": "Rhone river",
+    "level": 1,
+    "levelLabel": "LEVEL 1 · DIRECT",
+    "color": "#5999FF",
+    "text": "Glaciers store water for a long time and feed many Alpine rivers, including the Rhone, especially in hot, dry summers. Glacier loss is expected to reduce this summer flow sharply. The cold melt water also cools the river, which many mountain water species need.",
+    "sources": [
+      {
+        "title": "Swiss Federal Office for the Environment (FOEN): Snow and glaciers in a changing climate",
+        "url": "https://www.bafu.admin.ch/en/snow-and-glaciers-in-a-changing-climate"
+      },
+      {
+        "title": "USGS: What are the impacts of glacier loss, other than losing an aesthetic landscape feature?",
+        "url": "https://www.usgs.gov/faqs/what-are-impacts-glacier-loss-other-losing-aesthetic-landscape-feature"
+      }
+    ],
+    "note": "Wording is a paraphrase of the sources. Not a number-based statement: add a figure only if it comes from a source in data/."
+  },
+  {
+    "id": "forest",
+    "title": "Forest",
+    "level": 2,
+    "levelLabel": "LEVEL 2",
+    "color": "#73D18C",
+    "text": "Glacier melt water carries minerals such as iron, zinc and manganese, which the ice collects as it grinds over rock. This is a source of nutrients for plants downstream.",
+    "sources": [
+      {
+        "title": "Seequent: Glaciers, their critical role in preserving ecosystems",
+        "url": "https://www.seequent.com/glaciers-their-critical-role-in-preserving-ecosystems/"
+      }
+    ],
+    "note": "The source says 'plants downstream'; it does not mention forests or bacteria. The original sketch text ('needs minerals and bacteria') is therefore NOT used. Seequent is a company website: replace or add a scientific source about the Alpine forest or glacier forefield before the final version."
+  },
+  {
+    "id": "animals",
+    "title": "Animals",
+    "level": 3,
+    "levelLabel": "LEVEL 3",
+    "color": "#F2B859",
+    "text": "Some aquatic insects in mountain streams cannot survive without the cold water from glaciers. They are an important part of the food web. A study of 19 mainly aquatic insect species in the Alps projects that most of them will lose habitat by 2100 as glaciers retreat.",
+    "sources": [
+      {
+        "title": "University of Leeds / University of Essex: Vanishing glaciers threaten Alpine biodiversity (study in Nature Ecology & Evolution, 2023)",
+        "url": "https://climate.leeds.ac.uk/news/vanishing-glaciers-threaten-alpine-biodiversity/"
+      },
+      {
+        "title": "USGS: What are the impacts of glacier loss, other than losing an aesthetic landscape feature?",
+        "url": "https://www.usgs.gov/faqs/what-are-impacts-glacier-loss-other-losing-aesthetic-landscape-feature"
+      }
+    ],
+    "note": "The study covers the Alps in general, not only the Rhonegletscher. Say so in the pop-up if there is room."
+  },
+  {
+    "id": "lake",
+    "title": "Lake Geneva",
+    "level": 4,
+    "levelLabel": "LEVEL 4 · DISTANT",
+    "color": "#5999FF",
+    "text": "The Rhone has its source at the Rhone Glacier and is the main inflow of Lake Geneva. Because glacier loss is expected to reduce the summer flow of rivers like the Rhone, less melt water will reach the lake in summer.",
+    "sources": [
+      {
+        "title": "Wikipedia: Lake Geneva",
+        "url": "https://en.wikipedia.org/wiki/Lake_Geneva"
+      },
+      {
+        "title": "Swiss Federal Office for the Environment (FOEN): Snow and glaciers in a changing climate",
+        "url": "https://www.bafu.admin.ch/en/snow-and-glaciers-in-a-changing-climate"
+      }
+    ],
+    "note": "The second sentence combines two sources (the Rhone feeds the lake; glacier loss reduces summer flow of rivers like the Rhone) and is an inference, not a measured result for the lake. Replace Wikipedia with a primary source (for example a Lake Geneva commission or a study) before the final version."
+  }
+]
