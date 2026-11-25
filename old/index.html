@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>RHONEGLETSCHER</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div id="app">
+      <header class="chrome-header">
+        <div class="title-block">
+          <h1>RHONEGLETSCHER</h1>
+          <p>What depends on this glacier?</p>
+        </div>
+        <div class="header-controls">
+          <div class="zoom-indicator" id="zoom-indicator">ZOOM ×1</div>
+          <button type="button" id="reset-view">RESET VIEW</button>
+        </div>
+      </header>
+
+      <aside class="layers-panel" id="layers-panel">
+        <h2>LAYERS</h2>
+        <form id="layers-form"></form>
+      </aside>
+
+      <svg id="stage" aria-label="Rhonegletscher dependency system"></svg>
+
+      <footer class="timeline" id="timeline">
+        <div class="year-readout">
+          <span class="year-label">YEAR</span>
+          <span class="year-value" id="year-value">2010</span>
+        </div>
+        <button type="button" class="play-button" id="play-button">PLAY</button>
+        <div class="slider-block">
+          <input
+            type="range"
+            id="year-slider"
+            min="2010"
+            max="2025"
+            step="1"
+            value="2010"
+            aria-label="Year"
+          />
+          <div class="slider-ticks" id="slider-ticks"></div>
+        </div>
+      </footer>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+    <script src="main.js"></script>
+  </body>
+</html>

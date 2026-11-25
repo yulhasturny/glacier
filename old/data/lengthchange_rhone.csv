@@ -1,0 +1,152 @@
+The data of the Swiss Glacier Monitoring Network (GLAMOS) are freely available (https://www.glamos.ch) and may be used with indication of the source for scientific and non-commercial use.
+When using these data, please cite as:
+GLAMOS (2025). Swiss Glacier Length Change, release 2025, Glacier Monitoring Switzerland, doi:10.18750/lengthchange.2025.r2025.
+
+SWISS GLACIER LENGTH CHANGE
+
+glacier name,glacier id,start date of observation,quality of start date,end date of observation,quality of end date,length change,elevation of glacier tongue,observer
+,(according to Swiss Glacier Inventory),date_start,x = date not exactly known,date_end,x = date not exactly known,dL,h_min,
+,,yyyy-mm-dd (ISO 8601),,yyyy-mm-dd (ISO 8601),,m,m asl.,
+Rhonegletscher,B43-03,1879-09-01,x,1880-09-01,x,-52.00,,-
+Rhonegletscher,B43-03,1880-09-01,x,1881-09-01,x,-55.00,,-
+Rhonegletscher,B43-03,1881-09-01,x,1882-09-01,x,-73.00,,-
+Rhonegletscher,B43-03,1882-09-01,x,1883-09-01,x,-18.00,,-
+Rhonegletscher,B43-03,1883-09-01,x,1884-09-01,x,-20.00,,-
+Rhonegletscher,B43-03,1884-09-01,x,1885-09-01,x,-10.00,,-
+Rhonegletscher,B43-03,1885-09-01,x,1886-09-01,x,-10.00,,-
+Rhonegletscher,B43-03,1886-09-01,x,1887-09-01,x,-12.00,,-
+Rhonegletscher,B43-03,1887-09-01,x,1888-09-01,x,-12.00,,-
+Rhonegletscher,B43-03,1888-09-01,x,1889-09-01,x,-11.00,,-
+Rhonegletscher,B43-03,1889-09-01,x,1890-09-01,x,-7.00,,-
+Rhonegletscher,B43-03,1890-09-01,x,1891-09-01,x,-5.00,,-
+Rhonegletscher,B43-03,1891-09-01,x,1892-09-01,x,-1.00,,-
+Rhonegletscher,B43-03,1892-09-01,x,1893-09-01,x,-2.00,,-
+Rhonegletscher,B43-03,1893-09-01,x,1894-09-01,x,-20.00,,-
+Rhonegletscher,B43-03,1894-09-01,x,1895-09-01,x,-20.00,,-
+Rhonegletscher,B43-03,1895-09-01,x,1896-09-01,x,-8.00,,-
+Rhonegletscher,B43-03,1896-09-01,x,1897-09-01,x,-12.00,,-
+Rhonegletscher,B43-03,1897-09-01,x,1898-09-01,x,-5.00,,-
+Rhonegletscher,B43-03,1898-09-01,x,1899-09-01,x,-10.00,,-
+Rhonegletscher,B43-03,1899-09-01,x,1900-09-01,x,-11.00,,-
+Rhonegletscher,B43-03,1900-09-01,x,1901-09-01,x,-16.00,,-
+Rhonegletscher,B43-03,1901-09-01,x,1902-09-01,x,-13.00,,-
+Rhonegletscher,B43-03,1902-09-01,x,1903-09-01,x,-12.00,,-
+Rhonegletscher,B43-03,1903-09-01,x,1904-09-01,x,-8.00,,-
+Rhonegletscher,B43-03,1904-09-01,x,1905-09-01,x,-22.00,,-
+Rhonegletscher,B43-03,1905-09-01,x,1906-09-01,x,-16.00,,-
+Rhonegletscher,B43-03,1906-09-01,x,1907-09-01,x,-25.00,,-
+Rhonegletscher,B43-03,1907-09-01,x,1908-09-01,x,-29.00,,-
+Rhonegletscher,B43-03,1908-09-01,x,1909-09-01,x,-21.00,,-
+Rhonegletscher,B43-03,1909-09-01,x,1910-09-01,x,-13.00,,-
+Rhonegletscher,B43-03,1910-09-01,x,1911-09-01,x,-10.00,,-
+Rhonegletscher,B43-03,1911-09-01,x,1912-09-01,x,-11.00,,-
+Rhonegletscher,B43-03,1912-09-01,x,1913-09-01,x,14.00,,-
+Rhonegletscher,B43-03,1913-09-01,x,1915-09-01,x,22.00,,-
+Rhonegletscher,B43-03,1915-09-01,x,1916-09-01,x,15.00,,-
+Rhonegletscher,B43-03,1916-09-01,x,1917-09-01,x,4.00,,-
+Rhonegletscher,B43-03,1917-09-01,x,1918-09-01,x,15.00,,-
+Rhonegletscher,B43-03,1918-09-01,x,1919-09-01,x,33.00,,-
+Rhonegletscher,B43-03,1919-09-01,x,1920-09-01,x,12.00,,-
+Rhonegletscher,B43-03,1920-09-01,x,1921-09-01,x,22.00,,-
+Rhonegletscher,B43-03,1921-09-01,x,1922-09-01,x,-28.00,,-
+Rhonegletscher,B43-03,1922-09-01,x,1923-09-01,x,-9.00,,-
+Rhonegletscher,B43-03,1923-09-01,x,1924-09-01,x,-3.00,,-
+Rhonegletscher,B43-03,1924-09-01,x,1925-09-01,x,-12.00,,-
+Rhonegletscher,B43-03,1925-09-01,x,1926-09-01,x,4.00,,-
+Rhonegletscher,B43-03,1926-09-01,x,1927-09-01,x,6.00,,-
+Rhonegletscher,B43-03,1927-09-01,x,1928-09-01,x,-6.00,,-
+Rhonegletscher,B43-03,1928-09-01,x,1929-09-01,x,-5.00,,-
+Rhonegletscher,B43-03,1929-09-01,x,1930-09-01,x,-20.00,,-
+Rhonegletscher,B43-03,1930-09-01,x,1931-09-01,x,-16.00,,-
+Rhonegletscher,B43-03,1931-09-01,x,1932-09-01,x,-16.00,,-
+Rhonegletscher,B43-03,1932-09-01,x,1933-09-01,x,-9.00,,-
+Rhonegletscher,B43-03,1933-09-01,x,1934-09-01,x,-25.00,,-
+Rhonegletscher,B43-03,1934-09-01,x,1935-09-01,x,-17.00,,-
+Rhonegletscher,B43-03,1935-09-01,x,1936-09-01,x,-10.00,,-
+Rhonegletscher,B43-03,1936-09-01,x,1937-09-01,x,0.00,,-
+Rhonegletscher,B43-03,1937-09-01,x,1938-09-01,x,-5.00,,-
+Rhonegletscher,B43-03,1938-09-01,x,1939-09-01,x,-7.00,,-
+Rhonegletscher,B43-03,1939-09-01,x,1940-09-01,x,7.00,,-
+Rhonegletscher,B43-03,1940-09-01,x,1941-09-01,x,14.00,,-
+Rhonegletscher,B43-03,1941-09-01,x,1942-09-01,x,-10.00,,-
+Rhonegletscher,B43-03,1942-09-01,x,1943-09-01,x,-10.00,,-
+Rhonegletscher,B43-03,1943-09-01,x,1944-09-01,x,-135.00,,-
+Rhonegletscher,B43-03,1944-09-01,x,1945-09-01,x,-15.00,,-
+Rhonegletscher,B43-03,1945-09-01,x,1946-09-01,x,-30.00,,-
+Rhonegletscher,B43-03,1946-09-01,x,1947-09-01,x,-80.00,,-
+Rhonegletscher,B43-03,1947-09-01,x,1948-09-01,x,-30.00,,-
+Rhonegletscher,B43-03,1948-09-01,x,1949-09-01,x,-22.00,,-
+Rhonegletscher,B43-03,1949-09-01,x,1950-09-01,x,-20.00,,-
+Rhonegletscher,B43-03,1950-09-01,x,1951-09-01,x,-7.00,,-
+Rhonegletscher,B43-03,1951-09-01,x,1952-09-01,x,0.00,,-
+Rhonegletscher,B43-03,1952-09-01,x,1953-09-01,x,0.00,,-
+Rhonegletscher,B43-03,1953-09-01,x,1954-09-01,x,0.00,,-
+Rhonegletscher,B43-03,1954-09-01,x,1955-09-01,x,0.00,,-
+Rhonegletscher,B43-03,1955-09-01,x,1956-09-01,x,0.00,,-
+Rhonegletscher,B43-03,1956-09-01,x,1957-09-01,x,-9.00,,-
+Rhonegletscher,B43-03,1957-09-01,x,1958-09-01,x,-2.00,,-
+Rhonegletscher,B43-03,1958-09-01,x,1959-09-01,x,-8.00,,-
+Rhonegletscher,B43-03,1959-09-01,x,1960-09-01,x,-7.00,,-
+Rhonegletscher,B43-03,1960-09-01,x,1961-09-01,x,-4.00,,-
+Rhonegletscher,B43-03,1961-09-01,x,1962-09-01,x,-3.00,,-
+Rhonegletscher,B43-03,1962-09-01,x,1963-09-01,x,-86.00,,-
+Rhonegletscher,B43-03,1963-09-01,x,1964-09-01,x,-6.00,,-
+Rhonegletscher,B43-03,1964-09-01,x,1965-09-01,x,-12.00,,-
+Rhonegletscher,B43-03,1965-09-01,x,1966-09-01,x,11.00,,-
+Rhonegletscher,B43-03,1966-09-01,x,1967-09-01,x,-5.00,,-
+Rhonegletscher,B43-03,1967-09-01,x,1968-09-01,x,-11.00,,-
+Rhonegletscher,B43-03,1968-09-01,x,1969-09-01,x,6.00,,-
+Rhonegletscher,B43-03,1969-09-01,x,1970-09-01,x,0.00,,-
+Rhonegletscher,B43-03,1970-09-01,x,1971-09-01,x,7.00,,-
+Rhonegletscher,B43-03,1971-09-01,x,1972-09-01,x,-10.00,,-
+Rhonegletscher,B43-03,1972-09-01,x,1973-09-01,x,-5.00,,-
+Rhonegletscher,B43-03,1973-09-01,x,1974-09-01,x,3.00,,-
+Rhonegletscher,B43-03,1974-09-01,x,1975-09-01,x,17.00,,-
+Rhonegletscher,B43-03,1975-09-01,x,1976-09-01,x,-18.00,,-
+Rhonegletscher,B43-03,1976-09-01,x,1977-09-01,x,15.00,,-
+Rhonegletscher,B43-03,1977-09-01,x,1978-09-01,x,7.00,,-
+Rhonegletscher,B43-03,1978-09-01,x,1979-09-01,x,-3.00,,-
+Rhonegletscher,B43-03,1979-09-01,x,1980-09-01,x,16.00,,-
+Rhonegletscher,B43-03,1980-09-01,x,1981-09-01,x,0.00,,-
+Rhonegletscher,B43-03,1981-09-01,x,1982-09-01,x,-5.00,,-
+Rhonegletscher,B43-03,1982-09-01,x,1983-09-01,x,-1.00,,-
+Rhonegletscher,B43-03,1983-09-01,x,1984-09-01,x,-2.00,,-
+Rhonegletscher,B43-03,1984-09-01,x,1985-09-01,x,-1.00,,-
+Rhonegletscher,B43-03,1985-09-01,x,1986-09-01,x,1.00,,-
+Rhonegletscher,B43-03,1986-09-01,x,1987-09-01,x,9.00,,-
+Rhonegletscher,B43-03,1987-09-01,x,1988-09-01,x,-19.00,,-
+Rhonegletscher,B43-03,1988-09-01,x,1989-09-01,x,-5.00,,-
+Rhonegletscher,B43-03,1989-09-01,x,1990-09-01,x,-16.00,,-
+Rhonegletscher,B43-03,1990-09-01,x,1991-09-01,x,-31.00,,-
+Rhonegletscher,B43-03,1991-09-01,x,1992-09-01,x,-10.00,,-
+Rhonegletscher,B43-03,1992-09-01,x,1993-09-01,x,-12.00,,-
+Rhonegletscher,B43-03,1993-09-01,x,1994-09-01,x,-7.00,,-
+Rhonegletscher,B43-03,1994-09-01,x,1995-09-01,x,1.00,,-
+Rhonegletscher,B43-03,1995-09-01,x,1996-09-01,x,-9.00,,-
+Rhonegletscher,B43-03,1996-09-01,x,1997-09-01,x,-18.00,,-
+Rhonegletscher,B43-03,1997-09-01,x,1999-09-09,,-11.00,,-
+Rhonegletscher,B43-03,1999-09-09,,2000-08-23,,-5.90,2186.7,VAW/ETHZ; Andreas Bauder
+Rhonegletscher,B43-03,2000-08-23,,2001-08-23,,-6.10,2193.4,VAW/ETHZ; Andreas Bauder
+Rhonegletscher,B43-03,2001-08-23,,2002-09-13,,-11.10,2201,VAW/ETHZ; Andreas Bauder
+Rhonegletscher,B43-03,2002-09-13,,2003-08-08,,-2.00,2209.4,VAW/ETHZ; Andreas Bauder
+Rhonegletscher,B43-03,2003-08-08,,2004-09-17,,-11.40,2208,VAW/ETHZ; Andreas Bauder
+Rhonegletscher,B43-03,2004-09-17,,2005-09-15,,-7.50,2208,VAW/ETHZ; Andreas Bauder
+Rhonegletscher,B43-03,2005-09-15,,2006-09-05,,-7.60,2209,VAW/ETHZ; Andreas Bauder
+Rhonegletscher,B43-03,2006-09-05,,2007-09-12,,-11.60,2208.7,VAW/ETHZ; Andreas Bauder
+Rhonegletscher,B43-03,2007-09-12,,2008-08-29,,-3.30,2209.3,VAW/ETHZ; Andreas Bauder
+Rhonegletscher,B43-03,2008-08-29,,2009-09-07,,-4.10,2208,VAW/ETHZ; Andreas Bauder
+Rhonegletscher,B43-03,2009-09-07,,2010-09-20,,-3.20,2208.4,VAW/ETHZ; Andreas Bauder
+Rhonegletscher,B43-03,2010-09-20,,2011-09-22,,-50.60,2208.2,VAW/ETHZ; Andreas Bauder
+Rhonegletscher,B43-03,2011-09-22,,2012-08-27,,-40.10,2209.2,VAW/ETHZ; Andreas Bauder
+Rhonegletscher,B43-03,2012-08-27,,2013-09-23,,-30.60,2205.3,VAW/ETHZ; Andreas Bauder
+Rhonegletscher,B43-03,2013-09-23,,2014-09-23,,-27.60,2206.9,VAW/ETHZ; Andreas Bauder
+Rhonegletscher,B43-03,2014-09-23,,2015-08-05,,-6.20,2208.1,VAW/ETHZ; Andreas Bauder
+Rhonegletscher,B43-03,2015-08-05,,2016-08-08,,-18.00,2210.9,VAW/ETHZ; Andreas Bauder
+Rhonegletscher,B43-03,2016-08-08,,2017-09-21,,-36.00,,VAW/ETHZ; Andreas Bauder
+Rhonegletscher,B43-03,2017-09-21,,2018-07-11,,-34.60,,VAW/ETHZ; Andreas Bauder
+Rhonegletscher,B43-03,2018-07-11,,2019-08-25,,-36.20,,VAW/ETHZ; Andreas Bauder
+Rhonegletscher,B43-03,2019-08-25,,2020-09-13,,-29.30,,VAW/ETHZ; Andreas Bauder
+Rhonegletscher,B43-03,2020-09-13,,2021-08-20,,-14.50,,VAW/ETHZ; Andreas Bauder
+Rhonegletscher,B43-03,2021-08-20,,2022-07-16,,-44.80,,VAW/ETHZ; Andreas Bauder
+Rhonegletscher,B43-03,2022-07-16,,2023-08-20,,-95.50,,VAW/ETHZ; Andreas Bauder
+Rhonegletscher,B43-03,2023-08-20,,2024-08-23,,-115.10,,VAW/ETHZ; Andreas Bauder

@@ -1,0 +1,10 @@
+The data of the Swiss Glacier Monitoring Network (GLAMOS) are freely available (https://www.glamos.ch) and may be used with indication of the source for scientific and non-commercial use.
+When using these data, please cite as:
+GLAMOS (1881-2025). The Swiss Glaciers 1880-2022/23, Glaciological Reports No 1-142, Yearbooks of the Cryospheric Commission of the Swiss Academy of Sciences (SCNAT), published since 1964 by VAW / ETH Zurich, doi:10.18752/glrep_series.
+
+SWISS GLACIER LIST (AVAILABLE DATA)
+
+glacier name,glacier id,coordx,coordy,glacier area,survey year for glacier area,length change,mass balance,volume change
+,(according to Swiss Glacier Inventory),EPSG-ID=2056,EPSG-ID=2056,area,date,data available,data available,data available
+,,x_LV95,Y_LV95,km2,yyyy,,,
+Rhonegletscher,B43-03,2673742,1165585,13.577,2023,1,1,1
