@@ -16,12 +16,19 @@
   --ice-top:#fcffff; --ice-l1:#e6f7f8; --ice-l2:#c6ebed; --ice-r1:#ade0e4; --ice-r2:#86ccd2; --ice-edge:#6aaeb6; --ice-hi:#ffffff;
   --shadow:#2b5865; --gain:#3f8792;
   --lm-top:#f6f7f8; --lm-l:#dfe4e7; --lm-r:#c5cfd3; --lm-edge:#8d9da4; --lm-roof:#aab8be;
-  --rock-l:#b9c2c6; --rock-r:#97a3a9; --snow:#ffffff;
+  --rock-l:#b9c2c6; --rock-r:#97a3a9; --snow:#ffffff; --rock-hi:#e6eaec; --rock-lo:#56636a;
   --water:#cfe4ec; --jet:#ffffff;
   --train-l:#b8463c; --train-r:#953a32; --train-t:#cc6a60; --twin:#e4f1f4;
   --field:#d5e8dc; --field-line:#ffffff;
   --sign:#ffffff; --sign-ink:#13313b; --sign-line:#c3d6db;
   --veil:rgba(237,244,246,.86);
+  /* frosted glass: semi-transparent, blurred background, bright edge on top */
+  --glass:linear-gradient(140deg,rgba(255,255,255,.66),rgba(212,238,243,.36));
+  --glass-hover:linear-gradient(140deg,rgba(255,255,255,.82),rgba(222,244,247,.5));
+  --glass-line:rgba(255,255,255,.8);
+  --glass-shadow:0 10px 34px rgba(19,49,59,.13),inset 0 1px 0 rgba(255,255,255,.9),inset 0 -1px 0 rgba(255,255,255,.3);
+  --glass-inner:rgba(255,255,255,.42);
+  --glass-blur:blur(18px) saturate(1.5);
   --font:"Jost","Avenir Next","Avenir","Futura","Segoe UI",system-ui,sans-serif;
   color-scheme:light; box-sizing:border-box;
 }
@@ -31,7 +38,7 @@
   --ice-top:#f2fbfc; --ice-l1:#cdeef0; --ice-l2:#a7dee2; --ice-r1:#88cdd3; --ice-r2:#5fb0b8; --ice-edge:#4f97a0; --ice-hi:#ffffff;
   --shadow:#000000; --gain:#7cc3cc;
   --lm-top:#c9d3d7; --lm-l:#a9b6bb; --lm-r:#8a99a0; --lm-edge:#5f7178; --lm-roof:#76878e;
-  --rock-l:#7d8b91; --rock-r:#64727a; --snow:#e8f1f3;
+  --rock-l:#7d8b91; --rock-r:#64727a; --snow:#e8f1f3; --rock-hi:#9aa7ac; --rock-lo:#46535a;
   --water:#1f3b47; --jet:#e8f1f3;
   --field:#2d4a3c; --field-line:#cfe3d6;
   --sign:#f4fbfc; --sign-ink:#13313b; --sign-line:#9fbcc4; --veil:rgba(15,29,35,.86); color-scheme:dark;
@@ -42,10 +49,24 @@
   --ice-top:#f2fbfc; --ice-l1:#cdeef0; --ice-l2:#a7dee2; --ice-r1:#88cdd3; --ice-r2:#5fb0b8; --ice-edge:#4f97a0; --ice-hi:#ffffff;
   --shadow:#000000; --gain:#7cc3cc;
   --lm-top:#c9d3d7; --lm-l:#a9b6bb; --lm-r:#8a99a0; --lm-edge:#5f7178; --lm-roof:#76878e;
-  --rock-l:#7d8b91; --rock-r:#64727a; --snow:#e8f1f3;
+  --rock-l:#7d8b91; --rock-r:#64727a; --snow:#e8f1f3; --rock-hi:#9aa7ac; --rock-lo:#46535a;
   --water:#1f3b47; --jet:#e8f1f3;
   --field:#2d4a3c; --field-line:#cfe3d6;
   --sign:#f4fbfc; --sign-ink:#13313b; --sign-line:#9fbcc4; --veil:rgba(15,29,35,.86); color-scheme:dark;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --glass:linear-gradient(140deg,rgba(60,96,108,.5),rgba(15,29,35,.4));
+  --glass-hover:linear-gradient(140deg,rgba(76,116,128,.6),rgba(21,39,46,.5));
+  --glass-line:rgba(255,255,255,.2);
+  --glass-shadow:0 10px 34px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.16);
+  --glass-inner:rgba(255,255,255,.07);
+}}
+:root[data-theme="dark"]{
+  --glass:linear-gradient(140deg,rgba(60,96,108,.5),rgba(15,29,35,.4));
+  --glass-hover:linear-gradient(140deg,rgba(76,116,128,.6),rgba(21,39,46,.5));
+  --glass-line:rgba(255,255,255,.2);
+  --glass-shadow:0 10px 34px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.16);
+  --glass-inner:rgba(255,255,255,.07);
 }
 [hidden]{display:none!important}
 html,body{background:var(--bg);color:var(--ink)}
@@ -93,19 +114,26 @@ svg[data-layout="loss"] .rank{opacity:1}
 .lm .fl{fill:none;stroke:var(--field-line);stroke-width:1;vector-effect:non-scaling-stroke}
 .lm .water{fill:var(--water);stroke:none}
 .lm .rock-l{fill:var(--rock-l)} .lm .rock-r{fill:var(--rock-r)}
+.lm .mt{stroke-width:.6} .lm .ridge{fill:none;stroke:var(--lm-edge);stroke-width:.9;vector-effect:non-scaling-stroke;stroke-linejoin:round;opacity:.7}
 .lm .snow{fill:var(--snow);stroke:none}
 .lm .jet{fill:var(--jet);stroke:var(--lm-edge);stroke-width:.5}
 .lm .spray{fill:var(--jet);stroke:none;opacity:.6}
 .lm .l.tr{fill:var(--train-l)} .lm .r.tr{fill:var(--train-r)} .lm .t.tr{fill:var(--train-t)}
 .lm .twin{fill:var(--twin);stroke:none}
-/* "All ice in one block": hide the year blocks; otherwise hide the total block */
-body.total .yb,body:not(.total) .tb{opacity:0;pointer-events:none}
+/* Year blocks (yb), one block per decade (db), one block for everything (tb): only the current view's blocks are visible */
+body:not(.total) .tb,body:not(.decade) .db,body.total .yb,body.decade .yb{opacity:0;pointer-events:none}
+
+/* frosted glass for buttons and pop-up windows */
+#order,.pill,.round,#info,.intro,#skip{background:var(--glass);border:1px solid var(--glass-line);box-shadow:var(--glass-shadow);
+  -webkit-backdrop-filter:var(--glass-blur);backdrop-filter:var(--glass-blur)}
+#order,.pill,.round,#skip{transition:background .25s,box-shadow .25s,transform .25s}
+#order:hover,.pill:hover,.round:hover,#skip:hover{background:var(--glass-hover);transform:translateY(-1px)}
 
 /* overlay text */
 .intro{position:fixed;left:calc(max(16px,env(safe-area-inset-left,0px),4vw) + 18px);top:calc(env(safe-area-inset-top,0px) + clamp(20px,6vh,64px));
   max-width:min(34ch,calc(100vw - 68px));font-size:clamp(21px,2.5vw,34px);line-height:1.22;margin:0;
   pointer-events:none;opacity:0;transform:translateY(12px);transition:opacity .55s,transform .55s;
-  background:var(--veil);padding:14px 18px;border-radius:16px;margin-left:-18px;text-wrap:balance}
+  padding:16px 20px;border-radius:24px;margin-left:-18px;text-wrap:balance}
 .intro.on{opacity:1;transform:none}
 .intro .kicker{display:block;font-size:.55em;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:.5em;font-weight:500}
 .intro b{font-weight:600;color:var(--accent)}
@@ -117,10 +145,10 @@ body.total .yb,body:not(.total) .tb{opacity:0;pointer-events:none}
 body.free #controls{opacity:1;pointer-events:auto}
 #controls label{font-size:clamp(20px,2vw,28px)}
 .selectwrap{position:relative}
-#order,.pill{appearance:none;-webkit-appearance:none;font:inherit;font-size:clamp(18px,1.8vw,24px);color:var(--ink);background:var(--panel);border:2px solid var(--panel-line);border-radius:12px;padding:8px 48px 8px 16px;cursor:pointer}
-.pill{padding:8px 18px}
+#order,.pill{appearance:none;-webkit-appearance:none;font:inherit;font-size:clamp(18px,1.8vw,24px);color:var(--ink);border-radius:999px;padding:8px 50px 8px 20px;cursor:pointer}
+.pill{padding:8px 20px}
 .selectwrap::after{content:"";position:absolute;right:18px;top:50%;width:10px;height:10px;border-right:2.5px solid var(--ink);border-bottom:2.5px solid var(--ink);transform:translateY(-70%) rotate(45deg);pointer-events:none}
-.round{width:44px;height:44px;border-radius:50%;border:2px solid var(--panel-line);background:var(--panel);color:var(--ink);font:inherit;font-size:22px;line-height:1;cursor:pointer;display:grid;place-items:center;padding:0}
+.round{width:44px;height:44px;border-radius:50%;color:var(--ink);font:inherit;font-size:22px;line-height:1;cursor:pointer;display:grid;place-items:center;padding:0}
 button:focus-visible,select:focus-visible,a:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 #tip{font-size:16px;color:var(--muted);width:100%}
 #back{display:none}
@@ -136,10 +164,10 @@ footer{position:fixed;left:0;right:0;bottom:0;display:flex;justify-content:space
 footer > *{pointer-events:auto;min-width:0}
 footer .src{flex:1}
 footer a{color:inherit}
-#skip{font:inherit;font-size:clamp(18px,1.7vw,24px);color:var(--ink);background:none;border:0;padding:4px 0;cursor:pointer;white-space:nowrap;text-decoration:underline;text-underline-offset:4px;text-decoration-thickness:1px}
+#skip{font:inherit;font-size:clamp(16px,1.5vw,20px);color:var(--ink);border-radius:999px;padding:8px 20px;cursor:pointer;white-space:nowrap}
 
 #info{position:fixed;right:max(16px,env(safe-area-inset-right,0px));top:calc(env(safe-area-inset-top,0px) + 88px);width:min(420px,calc(100vw - 32px));max-height:calc(100vh - 190px);overflow:auto;
-  background:var(--panel);border:2px solid var(--panel-line);border-radius:20px;padding:24px 26px;box-sizing:border-box;z-index:5;
+  border-radius:28px;padding:24px 26px;box-sizing:border-box;z-index:5;
   transform:translateX(24px);opacity:0;pointer-events:none;transition:opacity .35s,transform .35s}
 #info.open{opacity:1;transform:none;pointer-events:auto}
 #info h2{font-size:52px;font-weight:500;margin:0;line-height:1}
@@ -150,11 +178,11 @@ footer a{color:inherit}
 #info .big{grid-column:1/-1;text-align:left;font-size:34px;color:var(--accent);line-height:1.1;margin-bottom:6px}
 #info .bigl{grid-column:1/-1;font-weight:600;font-size:16px;color:var(--ink);padding:0}
 #info p{line-height:1.45;margin:.6em 0;font-size:17px;max-width:62ch}
-#info .calc{font-variant-numeric:tabular-nums;background:var(--bg);border-radius:10px;padding:12px 14px;font-size:15px;line-height:1.6;overflow-x:auto;white-space:nowrap}
+#info .calc{font-variant-numeric:tabular-nums;background:var(--glass-inner);border:1px solid var(--glass-line);border-radius:16px;padding:12px 14px;font-size:15px;line-height:1.6;overflow-x:auto;white-space:nowrap}
 #info h3{font-size:17px;margin:1.2em 0 .3em;font-weight:600}
-#info .cmp{background:var(--bg);border-radius:12px;padding:12px 14px;margin:1em 0}
-#info .cmp p{margin:0 0 .6em}
-#info .cmp .pill{font-size:16px;padding:6px 14px;border-radius:10px}
+#info .cmp{background:var(--glass-inner);border:1px solid var(--glass-line);border-radius:18px;padding:14px 16px;margin:1em 0}
+#info .cmp p{margin:0 0 .7em}
+#info .cmp .pill{font-size:16px;padding:6px 16px}
 #close{position:absolute;right:14px;top:14px;width:40px;height:40px;font-size:24px}
 #info .sum{font-size:16px;color:var(--muted)}
 
@@ -342,8 +370,8 @@ function addSign(g,x,y,z,w,h,lines){
 
 function makeBlock(d){
   const e=d.e;
-  const g=el('g',{class:'block'+(d.gain?' gain':'')+(d.total?' tb':' yb'),tabindex:0,role:'button',
-    'aria-label':d.total?`All the ice melted in ${d.n} years: ${mio(d.ice)}, cube edge ${f0.format(e)} metres`:d.gain?`${d.year}: gain of ${mio(-d.ice)} of ice`:`${d.year}: ${mio(d.ice)} of ice melted, cube edge ${f0.format(e)} metres`},gItems);
+  const g=el('g',{class:'block'+(d.gain?' gain':'')+' '+(d.group||'yb'),tabindex:0,role:'button',
+    'aria-label':d.sum?`${d.heading}: ${mio(d.ice)} of ice melted in ${d.n} years, cube edge ${f0.format(e)} metres`:d.gain?`${d.year}: gain of ${mio(-d.ice)} of ice`:`${d.year}: ${mio(d.ice)} of ice melted, cube edge ${f0.format(e)} metres`},gItems);
   el('polygon',{class:'f l',points:pts([[-e*C,-e/2],[0,0],[0,e],[-e*C,e/2]])},g);
   el('polygon',{class:'f r',points:pts([[0,0],[e*C,-e/2],[e*C,e/2],[0,e]])},g);
   el('polygon',{class:'f t',points:pts([[0,-e],[e*C,-e/2],[0,0],[-e*C,-e/2]])},g);
@@ -352,27 +380,37 @@ function makeBlock(d){
   const lab=f0.format(e)+' m';
   let t=el('text',{transform:`matrix(${M_LEFT},0,0)`,x:-e*0.06,y:fs*1.05,'text-anchor':'end','font-size':fs},dim); t.textContent=lab;
   t=el('text',{transform:`matrix(${M_RIGHT},0,0)`,x:e*0.06,y:fs*1.05,'font-size':fs},dim); t.textContent=lab;
-  const sign=addSign(g,e*0.1,e*0.3,e+12,SW,SH,[
-    [d.total?'Total':String(d.year),62,SH*0.5,'y'],
-    [d.gain?`+${mio(-d.ice)}`:mio(d.ice),30,SH*0.84,d.gain?'g':'']
+  // summed blocks are big and seen from far away, so their signs are bigger too
+  const sc=d.sum?2.4:1, sw=SW*sc, shh=SH*sc;
+  const sign=addSign(g,e*0.1,e*0.3,e+12,sw,shh,[
+    [d.title||String(d.year),62*sc,shh*0.5,'y'],
+    [d.gain?`+${mio(-d.ice)}`:mio(d.ice),30*sc,shh*0.84,d.gain?'g':'']
   ]);
-  const sg=el('g',{class:'shg '+(d.total?'tb':'yb')},gShadow);
+  const sg=el('g',{class:'shg '+(d.group||'yb')},gShadow);
   if(!d.gain) el('polygon',{class:'shadow',points:pts(shadowPts(e,e,e))},sg);
   if(d.rank){const r=el('text',{class:'rank',transform:`matrix(${M_GROUND},${P(0,e+75)})`,'font-size':58},sg); r.textContent='No. '+d.rank;}
   // points used to frame the view
-  const q=P(e*0.1,e*0.3,e+12+SH);
-  const box=[[-e*C,-e/2],[0,-e],[e*C,-e/2],[e*C,e/2],[0,e],[-e*C,e/2],q,[q[0]+SW*C,q[1]+SW*0.5]];
-  const it={kind:'block',d,e,el:g,sh:sg,w:e,dp:e,box,dim,sign,fs,cur:{x:0,y:0}};
+  const q=P(e*0.1,e*0.3,e+12+shh);
+  const box=[[-e*C,-e/2],[0,-e],[e*C,-e/2],[e*C,e/2],[0,e],[-e*C,e/2],q,[q[0]+sw*C,q[1]+sw*0.5]];
+  const it={kind:'block',d,e,el:g,sh:sg,w:e,dp:e,box,dim,sign,fs,sc,cur:{x:0,y:0}};
   g.addEventListener('keydown',ev=>{if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();enterSingle(it);}});
   items.push(it); blocks.push(it); return it;
 }
 D.forEach(makeBlock);
 const byYear=Object.fromEntries(blocks.map(b=>[b.d.year,b]));
-// One block with all the ice melted in the years with a loss
-const TOTAL=(()=>{
-  const ice=losses.reduce((s,d)=>s+d.ice,0), water=losses.reduce((s,d)=>s+d.water,0);
-  return makeBlock({year:'1885–2026',total:true,ice,water,gain:false,e:Math.cbrt(ice),n:losses.length,net:D.reduce((s,d)=>s+d.ice,0)});
-})();
+// A summed block: all the ice melted in the years with a loss of a list of years
+function sumBlock(list,extra){
+  const ls=list.filter(d=>!d.gain);
+  const ice=ls.reduce((s,d)=>s+d.ice,0), water=ls.reduce((s,d)=>s+d.water,0);
+  return makeBlock({sum:true,ice,water,gain:false,e:Math.cbrt(ice),n:ls.length,m:list.length,net:list.reduce((s,d)=>s+d.ice,0),...extra});
+}
+// One block with everything
+const TOTAL=sumBlock(D,{year:'1885–2026',total:true,group:'tb',title:'Total',heading:'All the ice',range:'1885–1909 and 2007–2026'});
+// One block per decade
+const DECS=[1880,1890,1900,2000,2010,2020].map(dec=>{
+  const list=D.filter(d=>Math.floor(d.year/10)*10===dec);
+  return sumBlock(list,{year:`${dec}s`,dec,group:'db',title:`${dec}s`,heading:`The ${dec}s`,range:`${list[0].year}–${list[list.length-1].year}`});
+});
 
 // ---------- Landmarks (approximate, publicly known measurements, not from GLAMOS) ----------
 function box(g,x,y,z,w,d,h,cls=''){
@@ -467,15 +505,22 @@ LM.bridge=landmark({name:'Chapel Bridge, Lucerne',w:204,dp:44,
     : `The edge of the cube would be ${pct(e/204)} of the length of the Chapel Bridge in Lucerne (204 m).`});
 LM.matter=landmark({name:'Matterhorn',w:1800,dp:1800,
   draw:g=>{
-    // simplified shape: only the last 1’218 m, from the Hörnli hut (3’260 m) to the summit (4’478 m)
-    const w=1800,d=1800,pk=P(990,810,1218);
-    const a=P(0,d,0),b=P(w,d,0),c=P(w,0,0);
-    el('polygon',{class:'rock-l',points:pts([a,b,pk])},g);
-    el('polygon',{class:'rock-r',points:pts([c,b,pk])},g);
-    el('polygon',{class:'snow',points:pts([pk,mix(pk,a,.26),mix(pk,mix(a,b,.55),.18),mix(pk,b,.3)])},g);
-    el('polygon',{class:'snow',points:pts([pk,mix(pk,b,.3),mix(pk,mix(b,c,.5),.2),mix(pk,c,.24)])},g);
+    // Only the last 1’218 m, from the Hörnli hut (3’260 m) to the summit (4’478 m), in a simplified shape.
+    // Flat like the other landmarks: a light and a dark face and a snow cap,
+    // but with bent ridges (the shoulder on the front Hörnli ridge, a slightly crooked summit).
+    const TOP=[1000,760,1218];
+    const RL=[TOP,[905,845,1168],[800,950,1015],[610,1140,800],[365,1415,470],[130,1670,155],[0,1800,0]];        // left skyline
+    const RF=[TOP,[1105,895,1112],[1225,1030,1005],[1345,1170,940],[1500,1390,620],[1690,1640,235],[1800,1800,0]]; // Hörnli ridge (front)
+    const RR=[TOP,[1100,650,1125],[1205,560,1010],[1320,440,845],[1470,300,540],[1660,120,190],[1800,0,0]];       // right skyline
+    const Q=q=>P(...q);
+    const mid=(a,b,t,dz)=>[a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t,a[2]+(b[2]-a[2])*t-dz];
+    el('polygon',{class:'rock-l',points:pts([...RL].reverse().concat(RF.slice(1)).map(Q))},g);
+    el('polygon',{class:'rock-r',points:pts([...RF].reverse().concat(RR.slice(1)).map(Q))},g);
+    // snow caps with a jagged lower edge
+    el('polygon',{class:'snow',points:pts([TOP,RL[1],RL[2],mid(RL[2],RF[2],.3,90),mid(RL[2],RF[2],.6,10),mid(RL[2],RF[2],.8,70),RF[2],RF[1]].map(Q))},g);
+    el('polygon',{class:'snow',points:pts([TOP,RF[1],RF[2],mid(RF[2],RR[2],.25,60),mid(RF[2],RR[2],.55,0),mid(RF[2],RR[2],.8,80),RR[2],RR[1]].map(Q))},g);
   },
-  sign:[['Matterhorn',40,48,'y'],['last 1’218 m to the summit',30,86]],signAt:[990,810,1260],shadows:[[200,200,1400,1400,500]],
+  sign:[['Matterhorn',40,48,'y'],['last 1’218 m to the summit',30,86]],signAt:[1000,760,1260],shadows:[[200,200,1400,1400,500]],
   cmp:e=>`The cube would reach ${pct(e/1218)} of the way up the last 1’218 m of the Matterhorn, from the Hörnli hut (3’260 m) to the summit (4’478 m).`});
 LM.hb=landmark({name:'Zurich HB main hall',w:131,dp:43,
   draw:g=>{
@@ -523,16 +568,19 @@ function layoutYear(){
   labels.push({x:30,y:yB,z:rowTop(B.slice(0,cols)),text:'2007 – 2026',sub:'There are no measurements for 1910 – 2006'});
   return {pos,labels};
 }
+// Decades: one summed block each, 3 per row; the year blocks fly into their decade block and disappear
+const decCell=()=>Math.max(...DECS.map(b=>b.e))+360;
+const decadePos=i=>{const c=decCell(), e=DECS[i].e; return {x:(i%3)*c+(c-e)/2,y:Math.floor(i/3)*c+(c-e)/2};};
 function layoutDecade(){
-  const pos=new Map(),labels=[];
-  [1880,1890,1900,2000,2010,2020].forEach((dec,gi)=>{
-    const ox=(gi%3)*(4*S+S*0.9), oy=Math.floor(gi/3)*(3*S+S*1.3);
-    const list=D.filter(d=>Math.floor(d.year/10)*10===dec);
-    list.forEach((d,i)=>pos.set(d,{x:ox+(i%4)*S,y:oy+Math.floor(i/4)*S}));
-    const net=list.reduce((s,d)=>s+d.ice,0);
-    labels.push({x:ox+30,y:oy,z:rowTop(list.slice(0,4)),text:`${dec}s`,sub:`${list.length} ${list.length===1?'year':'years'} measured · net loss ${mio(net)}`});
+  const pos=new Map();
+  DECS.forEach((b,i)=>{
+    const p=decadePos(i), d=b.d;
+    D.filter(y=>Math.floor(y.year/10)*10===d.dec).forEach(y=>pos.set(y,{x:p.x+b.e/2-S/2,y:p.y+b.e/2-S/2}));
   });
-  return {pos,labels};
+  // one heading only: each decade block carries its own sign with the decade and the volume
+  const top=Math.max(...DECS.map(b=>b.e))+12+SH*2.4+160;
+  const labels=[{x:30,y:0,z:top,text:'One block per decade',sub:'Ice melted in the years with a loss'}];
+  return {pos,labels,maxY:2*decCell()};
 }
 function layoutLoss(){
   const pos=new Map(),labels=[],cols=7;
@@ -547,7 +595,7 @@ function layoutTotal(){
   // all year blocks fly into the middle of the big block and disappear
   const pos=new Map(), t=totalPos(), E=TOTAL.e;
   D.forEach(d=>pos.set(d,{x:t.x+E/2-S/2,y:t.y+E/2-S/2}));
-  const labels=[{x:t.x+30,y:t.y,z:E+12+SH+140,text:'All the ice in one block',sub:`${losses.length} years with a loss · 1885 – 1909 and 2007 – 2026`}];
+  const labels=[{x:t.x+30,y:t.y,z:E+12+SH*2.4+160,text:'All the ice in one block',sub:`${losses.length} years with a loss · 1885 – 1909 and 2007 – 2026`}];
   return {pos,labels,maxY:TOTAL_MAXY};
 }
 const rowTop=list=>Math.max(...list.map(d=>d.e))+12+SH+140;
@@ -559,6 +607,7 @@ function targets(name){
   L.pos.forEach((p,d)=>{const b=byYear[d.year];tg.set(b,{x:p.x+(S-b.e)/2,y:p.y+(S-b.e)/2});maxY=Math.max(maxY,p.y+S);});
   if(L.maxY)maxY=L.maxY;
   tg.set(TOTAL,totalPos());
+  DECS.forEach((b,i)=>tg.set(b,decadePos(i)));
   // Landmarks stand in one row in front of the blocks, so no block hides them.
   // Each gets as much room as its sign is wide, so the signs never overlap.
   let rx=0; const ry=maxY+S*0.35;
@@ -588,7 +637,9 @@ function place(it){
 }
 let lastOrder='';
 function sortDepth(){
-  const s=items.slice().sort((a,b)=>(a.cur.x+a.w/2+a.cur.y+a.dp/2)-(b.cur.x+b.w/2+b.cur.y+b.dp/2));
+  let s=items.slice().sort((a,b)=>(a.cur.x+a.w/2+a.cur.y+a.dp/2)-(b.cur.x+b.w/2+b.cur.y+b.dp/2));
+  // in the single view, the chosen block and landmark are always drawn on top of the faded rest
+  if(single)s=s.filter(i=>i!==single&&i!==pick).concat([single,pick]);
   const key=s.map(i=>items.indexOf(i)).join(',');
   if(key!==lastOrder){lastOrder=key;s.forEach(i=>gItems.appendChild(i.el));}
 }
@@ -599,18 +650,24 @@ function applyCam(){
   world.setAttribute('transform',`translate(${W/2},${H/2}) scale(${cam.k}) translate(${-cam.x},${-cam.y})`);
   for(const b of blocks){
     b.dim.style.display = b.fs*cam.k<7 ? 'none' : '';
-    b.sign.style.display = 30*cam.k<5 && 62*cam.k<9 ? 'none' : '';
+    b.sign.style.display = 30*b.sc*cam.k<5 && 62*b.sc*cam.k<9 ? 'none' : '';
   }
 }
 function fit(list,getPos,pad){
   let x0=Infinity,y0=Infinity,x1=-Infinity,y1=-Infinity;
   for(const it of list){const o=P(getPos(it).x,getPos(it).y);for(const q of it.box){const x=o[0]+q[0],y=o[1]+q[1];if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y;}}
-  const k=Math.min((W-pad.l-pad.r)/(x1-x0),(H-pad.t-pad.b)/(y1-y0));
+  // never zero or negative (e.g. a hidden or tiny window), otherwise the zoom maths breaks
+  const k=Math.max(1e-4,Math.min((W-pad.l-pad.r)/(x1-x0),(H-pad.t-pad.b)/(y1-y0)));
   return {k,x:(x0+x1)/2-((pad.l+W-pad.r)/2-W/2)/k,y:(y0+y1)/2-((pad.t+H-pad.b)/2-H/2)/k};
 }
 const overviewPad=()=>({l:24,r:W>700?84:24,t:W>700?100:130,b:70});
 const singlePad=()=>W>700?{l:40,r:Math.min(420,W-32)+56,t:100,b:80}:{l:20,r:20,t:90,b:H*0.52+30};
-const visible=it=>it===TOTAL?layout==='total':(it.kind==='block'?layout!=='total':true);
+function visibleIn(it,lay){
+  if(it.kind!=='block')return true;
+  const g=it.d.group||'yb';
+  return g==='tb'?lay==='total':g==='db'?lay==='decade':(lay!=='total'&&lay!=='decade');
+}
+const visible=it=>visibleIn(it,layout);
 const fitAll=(getPos=it=>it.cur)=>fit(items.filter(visible),getPos,overviewPad());
 function camLerp(a,b,t){return {x:lerp(a.x,b.x,t),y:lerp(a.y,b.y,t),k:Math.exp(lerp(Math.log(a.k),Math.log(b.k),t))};}
 
@@ -675,14 +732,28 @@ function tick(now){
   applyCam();
   if(done)anim=null;else requestAnimationFrame(tick);
 }
+// Put an item at its place in the current layout at once (also stops any running move for it).
+function snapHome(it){const p=home.get(it);it.cur={...p};it.from={...p};it.to={...p};place(it);}
 function setLayout(name,instant){
+  const old=layout;
   layout=name; svg.dataset.layout=name;
   document.body.classList.toggle('total',name==='total');
+  document.body.classList.toggle('decade',name==='decade');
   const {tg,labels,order}=targets(name);
   home=tg;
   drawLabels(labels,instant);
   if(instant){for(const it of items){it.cur={...tg.get(it)};place(it);}sortDepth();anim=null;return;}
-  animate(tg,free?fitAll(it=>tg.get(it)):null,order);
+  // Only blocks that are visible before and after the switch move.
+  // Blocks that appear wait at their new place and fade in; blocks that disappear fade out where they stand.
+  const moveTg=new Map(tg), leaving=[];
+  for(const it of items){
+    if(it.kind!=='block')continue;
+    const was=visibleIn(it,old), will=visibleIn(it,name);
+    if(!was){it.cur={...tg.get(it)};place(it);}
+    else if(!will){moveTg.set(it,{...it.cur});leaving.push(it);}
+  }
+  setTimeout(()=>leaving.forEach(it=>{if(!visibleIn(it,layout))snapHome(it);}),700);
+  animate(moveTg,free?fitAll(it=>tg.get(it)):null,order);
 }
 document.getElementById('order').addEventListener('change',e=>setLayout(e.target.value));
 
@@ -714,19 +785,29 @@ function enterSingle(it,lm){
   // The previous landmark fades out where it stands, then goes back home unseen.
   if(prev&&prev!==pick){
     tg.set(prev,{...prev.cur});
-    setTimeout(()=>{if(prev!==pick&&prev.el.classList.contains('gone')){prev.cur={...home.get(prev)};place(prev);}},700);
+    setTimeout(()=>{if(prev!==pick&&prev.el.classList.contains('gone'))snapHome(prev);},700);
   }
   animate(tg,singleCam(tg),null,900);
   showBlock(it);
 }
 function exitSingle(){
   if(!single)return;
+  const lm=pick;
   single.el.classList.remove('sel');
   single=null; pick=null;
-  for(const it of items){it.el.classList.remove('fade','gone');it.sh.classList.remove('fade','gone');}
+  for(const it of items){if(it===lm)continue;it.el.classList.remove('fade','gone');it.sh.classList.remove('fade','gone');}
+  // The landmark does not travel back across the map: it fades out next to the block
+  // and fades in again at its own place in the overview.
+  lm.el.classList.add('gone');lm.sh.classList.add('gone');
   document.body.classList.remove('single');
   info.classList.remove('open');
-  animate(home,free?fitAll(it=>home.get(it)):null,null,900);
+  const tg=new Map(home); tg.set(lm,{...lm.cur});
+  animate(tg,free?fitAll(it=>home.get(it)):null,null,900);
+  setTimeout(()=>{
+    if(pick===lm)return;          // chosen again in the meantime
+    snapHome(lm);
+    if(!single){lm.el.classList.remove('gone');lm.sh.classList.remove('gone');}
+  },650);
 }
 
 // ---------- Info box ----------
@@ -735,15 +816,17 @@ function showBlock(it){
   const d=it.d, m2=d.area*1e6;
   const dates=`Measured from ${date(d.start)} to ${date(d.end)}`;
   const cmp=`<div class="cmp"><p>${pick.cmp(d.e,d)}</p><button class="pill" type="button" data-act="another">Compare with another landmark ↻</button></div>`;
-  if(d.total){
-    infobody.innerHTML=`<h2 style="font-size:40px">All the ice</h2><p class="dates">${d.n} years with a loss · 1885–1909 and 2007–2026</p>
-      <dl><dt class="bigl">Ice melted in total</dt><dd class="big">${f0.format(d.ice)} m³</dd>
+  if(d.sum){
+    const g=d.m-d.n, yrs=n=>`${n} ${n===1?'year':'years'}`;
+    infobody.innerHTML=`<h2 style="font-size:40px">${d.heading}</h2><p class="dates">${yrs(d.m)} measured · ${d.range}</p>
+      <dl><dt class="bigl">Ice melted in ${yrs(d.n)} with a loss</dt><dd class="big">${f0.format(d.ice)} m³</dd>
       <dt>Cube edge</dt><dd>${f0.format(d.e)} m</dd>
       <dt>As water</dt><dd>${mio(d.water)}</dd>
-      <dt>Minus the ${D.length-d.n} years with a gain</dt><dd>${mio(d.net)} net</dd></dl>
-      <p>There are no measurements for 1910–2006, so those years are not part of this block.</p>
+      ${g>0?`<dt>Minus the ${yrs(g)} with a gain</dt><dd>${mio(d.net)} net</dd>`:''}</dl>
+      ${d.total?'<p>There are no measurements for 1910–2006, so those years are not part of this block.</p>':''}
+      ${d.dec===2000?'<p>In this decade, GLAMOS only measured 2007, 2008 and 2009.</p>':''}
       ${cmp}<h3>How this was calculated</h3><div class="calc">
-      Sum of the ${d.n} years with a loss = ${f0.format(d.ice)} m³ of ice<br>
+      Sum of the ${yrs(d.n)} with a loss = ${f0.format(d.ice)} m³ of ice<br>
       ∛ ${f0.format(d.ice)} m³ = ${f0.format(d.e)} m edge length</div>`;
   }else if(d.gain){
     infobody.innerHTML=`<h2>${d.year}</h2><p class="dates">${dates}</p>
