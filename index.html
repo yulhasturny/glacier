@@ -1,0 +1,832 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>The Rhône Glacier in Blocks of Ice</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: fixed isometric stage behind a tall scroll track; scroll = zoom-out, then a free map with controls.
+   Clicking a block opens a single view: that block alone, next to one random landmark at the same scale. */
+:root{
+  --bg:#edf4f6; --bg2:#f8fbfc; --ink:#13313b; --muted:#55717a; --grid:#9fbcc4;
+  --accent:#1d55a3; --panel:#fbfdfe; --panel-line:#13313b;
+  --ice-top:#fcffff; --ice-l1:#e6f7f8; --ice-l2:#c6ebed; --ice-r1:#ade0e4; --ice-r2:#86ccd2; --ice-edge:#6aaeb6; --ice-hi:#ffffff;
+  --shadow:#2b5865; --gain:#3f8792;
+  --lm-top:#f6f7f8; --lm-l:#dfe4e7; --lm-r:#c5cfd3; --lm-edge:#8d9da4; --lm-roof:#aab8be;
+  --rock-l:#b9c2c6; --rock-r:#97a3a9; --snow:#ffffff;
+  --water:#cfe4ec; --jet:#ffffff;
+  --train-l:#b8463c; --train-r:#953a32; --train-t:#cc6a60; --twin:#e4f1f4;
+  --field:#d5e8dc; --field-line:#ffffff;
+  --sign:#ffffff; --sign-ink:#13313b; --sign-line:#c3d6db;
+  --veil:rgba(237,244,246,.86);
+  --font:"Jost","Avenir Next","Avenir","Futura","Segoe UI",system-ui,sans-serif;
+  color-scheme:light; box-sizing:border-box;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f1d23; --bg2:#15272e; --ink:#e3f0f3; --muted:#93adb5; --grid:#3d5c66;
+  --accent:#8cb8ff; --panel:#15272e; --panel-line:#e3f0f3;
+  --ice-top:#f2fbfc; --ice-l1:#cdeef0; --ice-l2:#a7dee2; --ice-r1:#88cdd3; --ice-r2:#5fb0b8; --ice-edge:#4f97a0; --ice-hi:#ffffff;
+  --shadow:#000000; --gain:#7cc3cc;
+  --lm-top:#c9d3d7; --lm-l:#a9b6bb; --lm-r:#8a99a0; --lm-edge:#5f7178; --lm-roof:#76878e;
+  --rock-l:#7d8b91; --rock-r:#64727a; --snow:#e8f1f3;
+  --water:#1f3b47; --jet:#e8f1f3;
+  --field:#2d4a3c; --field-line:#cfe3d6;
+  --sign:#f4fbfc; --sign-ink:#13313b; --sign-line:#9fbcc4; --veil:rgba(15,29,35,.86); color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --bg:#0f1d23; --bg2:#15272e; --ink:#e3f0f3; --muted:#93adb5; --grid:#3d5c66;
+  --accent:#8cb8ff; --panel:#15272e; --panel-line:#e3f0f3;
+  --ice-top:#f2fbfc; --ice-l1:#cdeef0; --ice-l2:#a7dee2; --ice-r1:#88cdd3; --ice-r2:#5fb0b8; --ice-edge:#4f97a0; --ice-hi:#ffffff;
+  --shadow:#000000; --gain:#7cc3cc;
+  --lm-top:#c9d3d7; --lm-l:#a9b6bb; --lm-r:#8a99a0; --lm-edge:#5f7178; --lm-roof:#76878e;
+  --rock-l:#7d8b91; --rock-r:#64727a; --snow:#e8f1f3;
+  --water:#1f3b47; --jet:#e8f1f3;
+  --field:#2d4a3c; --field-line:#cfe3d6;
+  --sign:#f4fbfc; --sign-ink:#13313b; --sign-line:#9fbcc4; --veil:rgba(15,29,35,.86); color-scheme:dark;
+}
+[hidden]{display:none!important}
+html,body{background:var(--bg);color:var(--ink)}
+body{margin:0;padding:0;font-family:var(--font);font-size:18px;-webkit-font-smoothing:antialiased}
+#scroller{height:460vh}
+#stage{position:fixed;inset:0;overflow:hidden;background:radial-gradient(ellipse at 50% 40%,var(--bg2),var(--bg) 70%)}
+#scene{width:100%;height:100%;display:block;font-family:var(--font);user-select:none;-webkit-user-select:none}
+body.free #scene{touch-action:none;cursor:grab}
+body.free.dragging #scene{cursor:grabbing}
+
+/* scene */
+.grid line{stroke:var(--grid);stroke-width:.6;vector-effect:non-scaling-stroke;opacity:.45}
+.grid line.major{opacity:.8}
+.shadow{fill:url(#gS)}
+.rank{fill:var(--muted);font-weight:500;opacity:0;transition:opacity .6s}
+svg[data-layout="loss"] .rank{opacity:1}
+.ground text{fill:var(--ink);font-weight:500}
+.ground text.muted{fill:var(--muted);font-weight:400}
+.glabels{transition:opacity .6s}
+.top text{paint-order:stroke;stroke:var(--bg);stroke-linejoin:round}
+.glabels.out,body.single .glabels{opacity:0}
+.block{cursor:pointer;outline:none}
+.block,.lm,.shg{transition:opacity .6s}
+.fade{opacity:.06;pointer-events:none}
+.gone{opacity:0;pointer-events:none}
+.block .f{stroke:var(--ice-edge);stroke-width:1;vector-effect:non-scaling-stroke;stroke-linejoin:round}
+.block .t{fill:var(--ice-top)}
+.block .l{fill:url(#gL)}
+.block .r{fill:url(#gR)}
+.block .hl{fill:none;stroke:var(--ice-hi);stroke-width:1.6;vector-effect:non-scaling-stroke;stroke-linecap:round}
+.block:hover .f,.block:focus-visible .f{stroke:var(--accent);stroke-width:1.6}
+.block.sel .f{stroke:var(--accent);stroke-width:2.4}
+.block.gain .f{fill:var(--bg2);fill-opacity:.55;stroke:var(--gain);stroke-width:1.4;stroke-dasharray:7 5}
+.block.gain .hl{display:none}
+.dim text{fill:var(--accent);font-weight:500;letter-spacing:.01em}
+.block.gain .dim text{fill:var(--gain)}
+.sign rect{fill:var(--sign);stroke:var(--sign-line);stroke-width:1;vector-effect:non-scaling-stroke}
+.sign text{fill:var(--sign-ink)}
+.sign .y{font-weight:600}
+.sign .g{fill:var(--gain)}
+.lm .l{fill:var(--lm-l)} .lm .r{fill:var(--lm-r)} .lm .t{fill:var(--lm-top)} .lm .roof{fill:var(--lm-roof)}
+.lm polygon{stroke:var(--lm-edge);stroke-width:.8;vector-effect:non-scaling-stroke;stroke-linejoin:round}
+.lm .win{stroke:var(--lm-edge);stroke-width:.5;vector-effect:non-scaling-stroke;opacity:.55}
+.lm .field{fill:var(--field);stroke:none}
+.lm .fl{fill:none;stroke:var(--field-line);stroke-width:1;vector-effect:non-scaling-stroke}
+.lm .water{fill:var(--water);stroke:none}
+.lm .rock-l{fill:var(--rock-l)} .lm .rock-r{fill:var(--rock-r)}
+.lm .snow{fill:var(--snow);stroke:none}
+.lm .jet{fill:var(--jet);stroke:var(--lm-edge);stroke-width:.5}
+.lm .spray{fill:var(--jet);stroke:none;opacity:.6}
+.lm .l.tr{fill:var(--train-l)} .lm .r.tr{fill:var(--train-r)} .lm .t.tr{fill:var(--train-t)}
+.lm .twin{fill:var(--twin);stroke:none}
+/* "All ice in one block": hide the year blocks; otherwise hide the total block */
+body.total .yb,body:not(.total) .tb{opacity:0;pointer-events:none}
+
+/* overlay text */
+.intro{position:fixed;left:calc(max(16px,env(safe-area-inset-left,0px),4vw) + 18px);top:calc(env(safe-area-inset-top,0px) + clamp(20px,6vh,64px));
+  max-width:min(34ch,calc(100vw - 68px));font-size:clamp(21px,2.5vw,34px);line-height:1.22;margin:0;
+  pointer-events:none;opacity:0;transform:translateY(12px);transition:opacity .55s,transform .55s;
+  background:var(--veil);padding:14px 18px;border-radius:16px;margin-left:-18px;text-wrap:balance}
+.intro.on{opacity:1;transform:none}
+.intro .kicker{display:block;font-size:.55em;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:.5em;font-weight:500}
+.intro b{font-weight:600;color:var(--accent)}
+#hint{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 72px);transform:translateX(-50%);font-size:18px;color:var(--muted);transition:opacity .4s;pointer-events:none;text-shadow:0 0 8px var(--bg)}
+#hint.hide{opacity:0}
+
+#controls{position:fixed;left:max(16px,env(safe-area-inset-left,0px));top:calc(env(safe-area-inset-top,0px) + 18px);display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+  opacity:0;pointer-events:none;transition:opacity .5s;max-width:calc(100vw - 32px)}
+body.free #controls{opacity:1;pointer-events:auto}
+#controls label{font-size:clamp(20px,2vw,28px)}
+.selectwrap{position:relative}
+#order,.pill{appearance:none;-webkit-appearance:none;font:inherit;font-size:clamp(18px,1.8vw,24px);color:var(--ink);background:var(--panel);border:2px solid var(--panel-line);border-radius:12px;padding:8px 48px 8px 16px;cursor:pointer}
+.pill{padding:8px 18px}
+.selectwrap::after{content:"";position:absolute;right:18px;top:50%;width:10px;height:10px;border-right:2.5px solid var(--ink);border-bottom:2.5px solid var(--ink);transform:translateY(-70%) rotate(45deg);pointer-events:none}
+.round{width:44px;height:44px;border-radius:50%;border:2px solid var(--panel-line);background:var(--panel);color:var(--ink);font:inherit;font-size:22px;line-height:1;cursor:pointer;display:grid;place-items:center;padding:0}
+button:focus-visible,select:focus-visible,a:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+#tip{font-size:16px;color:var(--muted);width:100%}
+#back{display:none}
+body.single #back{display:inline-block}
+body.single #controls label,body.single .selectwrap,body.single #tip{display:none}
+
+#zoom{position:fixed;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(env(safe-area-inset-bottom,0px) + 70px);display:flex;flex-direction:column;gap:8px;opacity:0;pointer-events:none;transition:opacity .5s}
+body.free #zoom{opacity:1;pointer-events:auto}
+
+footer{position:fixed;left:0;right:0;bottom:0;display:flex;justify-content:space-between;align-items:flex-end;gap:16px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:10px calc(env(safe-area-inset-bottom,0px) + 14px);
+  font-size:15px;color:var(--muted);pointer-events:none}
+footer > *{pointer-events:auto;min-width:0}
+footer .src{flex:1}
+footer a{color:inherit}
+#skip{font:inherit;font-size:clamp(18px,1.7vw,24px);color:var(--ink);background:none;border:0;padding:4px 0;cursor:pointer;white-space:nowrap;text-decoration:underline;text-underline-offset:4px;text-decoration-thickness:1px}
+
+#info{position:fixed;right:max(16px,env(safe-area-inset-right,0px));top:calc(env(safe-area-inset-top,0px) + 88px);width:min(420px,calc(100vw - 32px));max-height:calc(100vh - 190px);overflow:auto;
+  background:var(--panel);border:2px solid var(--panel-line);border-radius:20px;padding:24px 26px;box-sizing:border-box;z-index:5;
+  transform:translateX(24px);opacity:0;pointer-events:none;transition:opacity .35s,transform .35s}
+#info.open{opacity:1;transform:none;pointer-events:auto}
+#info h2{font-size:52px;font-weight:500;margin:0;line-height:1}
+#info .dates{color:var(--muted);margin:.4em 0 1em;font-size:16px}
+#info dl{display:grid;grid-template-columns:auto 1fr;gap:6px 16px;margin:0 0 1em;font-variant-numeric:tabular-nums}
+#info dt{font-weight:500;font-size:16px;color:var(--muted);padding-top:3px}
+#info dd{margin:0;text-align:right}
+#info .big{grid-column:1/-1;text-align:left;font-size:34px;color:var(--accent);line-height:1.1;margin-bottom:6px}
+#info .bigl{grid-column:1/-1;font-weight:600;font-size:16px;color:var(--ink);padding:0}
+#info p{line-height:1.45;margin:.6em 0;font-size:17px;max-width:62ch}
+#info .calc{font-variant-numeric:tabular-nums;background:var(--bg);border-radius:10px;padding:12px 14px;font-size:15px;line-height:1.6;overflow-x:auto;white-space:nowrap}
+#info h3{font-size:17px;margin:1.2em 0 .3em;font-weight:600}
+#info .cmp{background:var(--bg);border-radius:12px;padding:12px 14px;margin:1em 0}
+#info .cmp p{margin:0 0 .6em}
+#info .cmp .pill{font-size:16px;padding:6px 14px;border-radius:10px}
+#close{position:absolute;right:14px;top:14px;width:40px;height:40px;font-size:24px}
+#info .sum{font-size:16px;color:var(--muted)}
+
+@media (max-width:700px){
+  body{font-size:16px}
+  #info{top:auto;bottom:calc(env(safe-area-inset-bottom,0px) + 12px);left:max(12px,env(safe-area-inset-left,0px));right:max(12px,env(safe-area-inset-right,0px));width:auto;max-height:52vh;transform:translateY(24px);padding:20px}
+  #info h2{font-size:40px}
+  #info .big{font-size:28px}
+  footer .src{font-size:13px}
+  .long{display:none}
+  #hint{font-size:16px;bottom:calc(env(safe-area-inset-bottom,0px) + 64px)}
+  .intro{left:calc(max(16px,env(safe-area-inset-left,0px)) + 12px);margin-left:-12px;padding:12px 14px;max-width:calc(100vw - 56px)}
+  #zoom{bottom:calc(env(safe-area-inset-bottom,0px) + 80px)}
+  body.single #zoom{display:none}
+  #controls label{display:none}
+}
+@media (prefers-reduced-motion:reduce){.intro,#info,#controls,#zoom,.glabels,.rank,.block,.lm,.shg{transition:none}}
+</style>
+</head>
+<body>
+
+<div id="stage">
+  <svg id="scene" data-layout="year" role="img" aria-label="Isometric view: one block of ice for each measured year of the Rhône Glacier">
+    <defs>
+      <linearGradient id="gL" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--ice-l1)"/><stop offset="1" style="stop-color:var(--ice-l2)"/></linearGradient>
+      <linearGradient id="gR" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--ice-r1)"/><stop offset="1" style="stop-color:var(--ice-r2)"/></linearGradient>
+      <linearGradient id="gS" x1="0" y1="1" x2="1" y2="0"><stop offset="0.15" style="stop-color:var(--shadow);stop-opacity:.30"/><stop offset="1" style="stop-color:var(--shadow);stop-opacity:0"/></linearGradient>
+    </defs>
+    <g id="world"></g>
+  </svg>
+</div>
+
+<div id="scroller" aria-hidden="true"></div>
+
+<p class="intro" data-step="0"><span class="kicker">Rhône Glacier · 2022</span>In a single year, the Rhône Glacier lost <b>44.7 million cubic metres</b> of ice. Pressed into one block, that would be a cube with edges <b>355 metres</b> long.</p>
+<p class="intro" data-step="1"><span class="kicker">For comparison, at the same scale</span>Zurich’s Prime Tower is 126 metres tall. The Grossmünster reaches about 62 metres to the tips of its towers. In front lies a football pitch, 105 × 68 metres.</p>
+<p class="intro" data-step="2"><span class="kicker">45 measured years</span>Each block is one year. GLAMOS measured the Rhône Glacier from 1885 to 1909 and from 2007 to 2026. In five years the glacier grew: those blocks are dashed.</p>
+<div id="hint">Scroll down to zoom out ↓</div>
+
+<div id="controls">
+  <label for="order">Sort by</label>
+  <span class="selectwrap"><select id="order">
+    <option value="year">Year</option>
+    <option value="decade">Decade</option>
+    <option value="loss">Largest loss first</option>
+    <option value="total">All ice in one block</option>
+  </select></span>
+  <button class="pill" id="back" type="button">← All years</button>
+  <button class="round" id="about" type="button" aria-label="How this was calculated">i</button>
+  <span id="tip">Click a block to see it on its own, next to a Swiss landmark.</span>
+</div>
+
+<div id="zoom">
+  <button class="round" id="zin" type="button" aria-label="Zoom in">+</button>
+  <button class="round" id="zout" type="button" aria-label="Zoom out">−</button>
+  <button class="round" id="zfit" type="button" aria-label="Fit to screen" style="font-size:17px">⤢</button>
+</div>
+
+<aside id="info" aria-live="polite">
+  <button class="round" id="close" type="button" aria-label="Close">×</button>
+  <div id="infobody"></div>
+</aside>
+
+<footer>
+  <span class="src">Data: <a href="https://www.glamos.ch" target="_blank" rel="noopener">GLAMOS</a> (2026)<span class="long">, Swiss Glacier Mass Balance, doi:10.18750/massbalance.2026.r2026 · Grid 100 m</span></span>
+  <button id="skip" type="button">Skip intro</button>
+</footer>
+
+<script>
+// Data from daten/massbalance_observation.csv (GLAMOS 2026), Rhône Glacier B43-03:
+// [year, start of measurement year, end of measurement year, annual mass balance in mm w.e., area in km²]
+const RAW=[[1885,"1884-09-15","1885-09-15",-683,19.10938],
+[1886,"1885-09-15","1886-09-15",-214,19.085],
+[1887,"1886-09-15","1887-09-15",-490,19.06188],
+[1888,"1887-09-15","1888-09-15",-224,19.04],
+[1889,"1888-09-15","1889-09-15",-554,19.02],
+[1890,"1889-09-15","1890-09-15",-58,18.99813],
+[1891,"1890-09-15","1891-09-15",54,18.98],
+[1892,"1891-09-15","1892-09-15",-547,18.95563],
+[1893,"1892-09-15","1893-09-15",-617,18.93688],
+[1894,"1893-09-15","1894-09-15",-1083,18.91438],
+[1895,"1894-09-15","1895-09-15",-824,18.89187],
+[1896,"1895-09-15","1896-09-15",296,18.87187],
+[1897,"1896-09-15","1897-09-15",462,18.84562],
+[1898,"1897-09-15","1898-09-15",-425,18.81625],
+[1899,"1898-09-15","1899-09-15",-640,18.79375],
+[1900,"1899-09-15","1900-09-15",-857,18.77563],
+[1901,"1900-09-15","1901-09-15",-708,18.75125],
+[1902,"1901-09-15","1902-09-15",-180,18.7325],
+[1903,"1902-09-15","1903-09-15",-345,18.70938],
+[1904,"1903-09-15","1904-09-15",-636,18.69625],
+[1905,"1904-09-15","1905-09-15",-1283,18.67375],
+[1906,"1905-09-15","1906-09-15",-1013,18.6625],
+[1907,"1906-09-15","1907-09-15",112,18.65375],
+[1908,"1907-09-15","1908-09-15",155,18.65],
+[1909,"1908-09-15","1909-09-15",-232,18.64937],
+[2007,"2006-10-27","2007-09-06",-77,15.93625],
+[2008,"2007-09-06","2008-09-11",-1139,15.93625],
+[2009,"2008-09-11","2009-09-10",-522,15.93625],
+[2010,"2009-09-10","2010-09-05",-391,15.80813],
+[2011,"2010-09-05","2011-09-15",-1545,15.80813],
+[2012,"2011-09-15","2012-09-11",-1008,15.80813],
+[2013,"2012-09-11","2013-09-23",-160,15.80813],
+[2014,"2013-09-23","2014-09-10",-353,15.57125],
+[2015,"2014-09-10","2015-09-10",-1083,15.57125],
+[2016,"2015-09-10","2016-09-20",-423,15.57125],
+[2017,"2016-09-20","2017-09-26",-1248,15.52313],
+[2018,"2017-09-26","2018-09-12",-1098,15.19375],
+[2019,"2018-09-12","2019-08-12",-773,15.30625],
+[2020,"2019-09-12","2020-09-11",-686,15.17375],
+[2021,"2020-09-11","2021-09-08",-102,15.17375],
+[2022,"2021-09-08","2022-09-09",-2653,15.17375],
+[2023,"2022-09-09","2023-10-17",-2129,15.01062],
+[2024,"2023-10-17","2024-09-06",-547,13.29875],
+[2025,"2024-09-06","2025-09-04",-1115,13.29875],
+[2026,"2025-09-04","2026-09-03",-2507,13.21562]];
+
+// ---------- Calculation ----------
+const ICE = 900, WATER = 1000;
+const D = RAW.map(([year,start,end,ba,area]) => {
+  const water = -(ba/1000) * area * 1e6;      // m³ of water, positive = loss
+  const ice = water * WATER / ICE;            // m³ of ice
+  return {year,start,end,ba,area,water,ice,gain:ice<0,e:Math.cbrt(Math.abs(ice))};
+});
+const losses = D.filter(d=>!d.gain).sort((a,b)=>b.ice-a.ice);
+losses.forEach((d,i)=>d.rank=i+1);
+
+// ---------- Helpers ----------
+const C = Math.cos(Math.PI/6);
+const P = (x,y,z=0) => [(x-y)*C, (x+y)*0.5 - z];
+const NS = 'http://www.w3.org/2000/svg';
+function el(tag,attrs={},parent){const n=document.createElementNS(NS,tag);for(const k in attrs)n.setAttribute(k,attrs[k]);if(parent)parent.appendChild(n);return n;}
+const pts = a => a.map(p=>p[0].toFixed(2)+','+p[1].toFixed(2)).join(' ');
+const nf = (min,max) => {const n=new Intl.NumberFormat('en-CH',{minimumFractionDigits:min,maximumFractionDigits:max});return {format:v=>n.format(v).replace(/'/g,'’')};};
+const f0=nf(0,0), f1=nf(1,1), f2=nf(2,2), f3=nf(3,3);
+const mio = v => f1.format(v/1e6)+' million m³';
+const pct = v => f0.format(v*100)+'%';
+const signed = v => (v<0?'−':'+')+f3.format(Math.abs(v));
+const date = s => new Date(s+'T12:00:00').toLocaleDateString('en-CH',{day:'numeric',month:'long',year:'numeric'});
+const lerp=(a,b,t)=>a+(b-a)*t, clamp=t=>Math.max(0,Math.min(1,t));
+const mix=(a,b,t)=>[lerp(a[0],b[0],t),lerp(a[1],b[1],t)];
+const ease=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
+const smooth=t=>t*t*(3-2*t);
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function hull(points){
+  const p=points.slice().sort((a,b)=>a[0]-b[0]||a[1]-b[1]);
+  const cross=(o,a,b)=>(a[0]-o[0])*(b[1]-o[1])-(a[1]-o[1])*(b[0]-o[0]);
+  const lo=[],up=[];
+  for(const q of p){while(lo.length>=2&&cross(lo[lo.length-2],lo[lo.length-1],q)<=0)lo.pop();lo.push(q);}
+  for(const q of p.reverse()){while(up.length>=2&&cross(up[up.length-2],up[up.length-1],q)<=0)up.pop();up.push(q);}
+  return lo.slice(0,-1).concat(up.slice(0,-1));
+}
+// Shadow: footprint w×d at (x0,y0), height h, light from front left
+function shadowPts(w,d,h,x0=0,y0=0){
+  const sx=h*0.22, sy=-h*0.95;
+  const base=[[x0,y0],[x0+w,y0],[x0+w,y0+d],[x0,y0+d]];
+  return hull(base.concat(base.map(([x,y])=>[x+sx,y+sy]))).map(([x,y])=>P(x,y,0));
+}
+// Text on faces
+const M_LEFT  = `${C},0.5,0,1`;    // face parallel to the x axis (front left)
+const M_RIGHT = `${C},-0.5,0,1`;   // face parallel to the y axis (front right)
+const M_GROUND= `${C},0.5,${-C},0.5`;
+
+// ---------- Scene ----------
+const svg=document.getElementById('scene'), world=document.getElementById('world');
+const gGrid=el('g',{class:'grid'},world), gShadow=el('g',{},world), gItems=el('g',{},world), gTop=el('g',{class:'ground top'},world);
+for(let v=-3000; v<=9000; v+=100){
+  const cls = v%500===0?'major':'';
+  let a=P(v,-3000),b=P(v,9000); el('line',{x1:a[0],y1:a[1],x2:b[0],y2:b[1],class:cls},gGrid);
+  a=P(-3000,v);b=P(9000,v); el('line',{x1:a[0],y1:a[1],x2:b[0],y2:b[1],class:cls},gGrid);
+}
+
+const S=420;                    // grid spacing of the blocks in metres
+const SW=260, SH=130;           // block sign in metres
+const items=[], blocks=[];
+
+function addSign(g,x,y,z,w,h,lines){
+  const q=P(x,y,z+h);
+  const s=el('g',{class:'sign',transform:`matrix(${M_LEFT},${q[0]},${q[1]})`},g);
+  el('rect',{width:w,height:h,rx:2},s);
+  lines.forEach(([txt,size,yy,cls])=>{const t=el('text',{x:w*0.08,y:yy,'font-size':size,class:cls||''},s);t.textContent=txt;});
+  return s;
+}
+
+function makeBlock(d){
+  const e=d.e;
+  const g=el('g',{class:'block'+(d.gain?' gain':'')+(d.total?' tb':' yb'),tabindex:0,role:'button',
+    'aria-label':d.total?`All the ice melted in ${d.n} years: ${mio(d.ice)}, cube edge ${f0.format(e)} metres`:d.gain?`${d.year}: gain of ${mio(-d.ice)} of ice`:`${d.year}: ${mio(d.ice)} of ice melted, cube edge ${f0.format(e)} metres`},gItems);
+  el('polygon',{class:'f l',points:pts([[-e*C,-e/2],[0,0],[0,e],[-e*C,e/2]])},g);
+  el('polygon',{class:'f r',points:pts([[0,0],[e*C,-e/2],[e*C,e/2],[0,e]])},g);
+  el('polygon',{class:'f t',points:pts([[0,-e],[e*C,-e/2],[0,0],[-e*C,-e/2]])},g);
+  el('polyline',{class:'hl',points:pts([[-e*C,-e/2],[0,0],[e*C,-e/2]])},g);
+  const fs=e*0.12, dim=el('g',{class:'dim'},g);
+  const lab=f0.format(e)+' m';
+  let t=el('text',{transform:`matrix(${M_LEFT},0,0)`,x:-e*0.06,y:fs*1.05,'text-anchor':'end','font-size':fs},dim); t.textContent=lab;
+  t=el('text',{transform:`matrix(${M_RIGHT},0,0)`,x:e*0.06,y:fs*1.05,'font-size':fs},dim); t.textContent=lab;
+  const sign=addSign(g,e*0.1,e*0.3,e+12,SW,SH,[
+    [d.total?'Total':String(d.year),62,SH*0.5,'y'],
+    [d.gain?`+${mio(-d.ice)}`:mio(d.ice),30,SH*0.84,d.gain?'g':'']
+  ]);
+  const sg=el('g',{class:'shg '+(d.total?'tb':'yb')},gShadow);
+  if(!d.gain) el('polygon',{class:'shadow',points:pts(shadowPts(e,e,e))},sg);
+  if(d.rank){const r=el('text',{class:'rank',transform:`matrix(${M_GROUND},${P(0,e+75)})`,'font-size':58},sg); r.textContent='No. '+d.rank;}
+  // points used to frame the view
+  const q=P(e*0.1,e*0.3,e+12+SH);
+  const box=[[-e*C,-e/2],[0,-e],[e*C,-e/2],[e*C,e/2],[0,e],[-e*C,e/2],q,[q[0]+SW*C,q[1]+SW*0.5]];
+  const it={kind:'block',d,e,el:g,sh:sg,w:e,dp:e,box,dim,sign,fs,cur:{x:0,y:0}};
+  g.addEventListener('keydown',ev=>{if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();enterSingle(it);}});
+  items.push(it); blocks.push(it); return it;
+}
+D.forEach(makeBlock);
+const byYear=Object.fromEntries(blocks.map(b=>[b.d.year,b]));
+// One block with all the ice melted in the years with a loss
+const TOTAL=(()=>{
+  const ice=losses.reduce((s,d)=>s+d.ice,0), water=losses.reduce((s,d)=>s+d.water,0);
+  return makeBlock({year:'1885–2026',total:true,ice,water,gain:false,e:Math.cbrt(ice),n:losses.length,net:D.reduce((s,d)=>s+d.ice,0)});
+})();
+
+// ---------- Landmarks (approximate, publicly known measurements, not from GLAMOS) ----------
+function box(g,x,y,z,w,d,h,cls=''){
+  const p=(a,b,c)=>P(x+a,y+b,z+c);
+  el('polygon',{class:'l '+cls,points:pts([p(0,d,0),p(w,d,0),p(w,d,h),p(0,d,h)])},g);
+  el('polygon',{class:'r '+cls,points:pts([p(w,0,0),p(w,d,0),p(w,d,h),p(w,0,h)])},g);
+  el('polygon',{class:'t '+cls,points:pts([p(0,0,h),p(w,0,h),p(w,d,h),p(0,d,h)])},g);
+}
+function pyramid(g,x,y,w,d,zb,zt){
+  const a=P(x+w/2,y+d/2,zt);
+  el('polygon',{class:'roof',points:pts([P(x,y+d,zb),P(x+w,y+d,zb),a])},g);
+  el('polygon',{class:'r',points:pts([P(x+w,y,zb),P(x+w,y+d,zb),a])},g);
+}
+function outline(g){
+  const out=[];
+  g.querySelectorAll('polygon,polyline').forEach(n=>n.getAttribute('points').trim().split(/\s+/).forEach(s=>{const [x,y]=s.split(',').map(Number);out.push([x,y]);}));
+  return out;
+}
+function landmark({name,w,dp,draw,sign,signAt,shadows,cmp}){
+  const g=el('g',{class:'lm'},gItems);
+  draw(g);
+  const bx=outline(g);
+  const sg=el('g',{class:'shg'},gShadow);
+  (shadows||[]).forEach(([x,y,ww,dd,h])=>el('polygon',{class:'shadow',points:pts(shadowPts(ww,dd,h,x,y))},sg));
+  const shh=104, sw=Math.max(250,...sign.map(([t,size])=>t.length*size*0.56+40));
+  const [sx,sy,sz]=signAt;
+  addSign(g,sx,sy,sz,sw,shh,sign);
+  const q=P(sx,sy,sz+shh);
+  bx.push(q,[q[0]+sw*C,q[1]+sw*0.5],[q[0],q[1]+shh],[q[0]+sw*C,q[1]+sw*0.5+shh]);
+  const it={kind:'lm',name,el:g,sh:sg,w,dp,sy,sw,box:bx,cmp,cur:{x:0,y:0}};
+  items.push(it); return it;
+}
+const heightCmp=(e,h,what)=>e>=h
+  ? `The cube would be ${f1.format(e/h)} times as tall as ${what}.`
+  : `The cube would reach ${pct(e/h)} of the height of ${what}.`;
+
+const LM={};
+LM.prime=landmark({name:'Prime Tower, Zurich',w:40,dp:60,
+  draw:g=>{
+    box(g,0,0,0,40,60,126);
+    for(let i=8;i<40;i+=8){const a=P(i,60,0),b=P(i,60,126);el('line',{class:'win',x1:a[0],y1:a[1],x2:b[0],y2:b[1]},g);}
+    for(let i=8;i<60;i+=8){const a=P(40,i,0),b=P(40,i,126);el('line',{class:'win',x1:a[0],y1:a[1],x2:b[0],y2:b[1]},g);}
+  },
+  sign:[['Prime Tower',40,48,'y'],['126 m tall',30,86]],signAt:[0,30,150],shadows:[[0,0,40,60,126]],
+  cmp:e=>heightCmp(e,126,'Zurich’s Prime Tower (126 m)')});
+LM.gross=landmark({name:'Grossmünster, Zurich',w:26,dp:62,
+  draw:g=>{
+    const p=(a,b,c)=>P(a,b,c);
+    el('polygon',{class:'roof',points:pts([p(0,0,20),p(13,0,32),p(13,48,32),p(0,48,20)])},g);
+    box(g,0,0,0,26,48,20);
+    el('polygon',{class:'roof',points:pts([p(13,0,32),p(26,0,20),p(26,48,20),p(13,48,32)])},g);
+    el('polygon',{class:'l',points:pts([p(0,48,20),p(26,48,20),p(13,48,32)])},g);
+    box(g,0,48,0,11,12,50); pyramid(g,0,48,11,12,50,62);
+    box(g,15,48,0,11,12,50); pyramid(g,15,48,11,12,50,62);
+  },
+  sign:[['Grossmünster',40,48,'y'],['62 m to the tower tips',30,86]],signAt:[0,31,90],shadows:[[0,0,26,62,62]],
+  cmp:e=>heightCmp(e,62,'the towers of the Grossmünster in Zurich (62 m)')});
+LM.field=landmark({name:'Football pitch',w:68,dp:105,
+  draw:g=>{
+    const L=(a)=>el('polyline',{class:'fl',points:pts(a.map(([x,y])=>P(x,y,0)))},g);
+    el('polygon',{class:'field',points:pts([P(-4,-4),P(72,-4),P(72,109),P(-4,109)])},g);
+    L([[0,0],[68,0],[68,105],[0,105],[0,0]]); L([[0,52.5],[68,52.5]]);
+    const circ=[];for(let a=0;a<=64;a++){const t=a/64*Math.PI*2;circ.push([34+9.15*Math.cos(t),52.5+9.15*Math.sin(t)]);}L(circ);
+    L([[13.85,0],[13.85,16.5],[54.15,16.5],[54.15,0]]); L([[13.85,105],[13.85,88.5],[54.15,88.5],[54.15,105]]);
+  },
+  sign:[['Football pitch',40,48,'y'],['105 × 68 m',30,86]],signAt:[0,52,40],
+  cmp:(e,d)=>{const h=Math.abs(d.ice)/(105*68);
+    return `Piled onto a football pitch (105 × 68 m), this ice would stand ${h>=1000?f1.format(h/1000)+' kilometres':f0.format(h)+' metres'} high.`;}});
+LM.jet=landmark({name:'Jet d’Eau, Geneva',w:60,dp:60,
+  draw:g=>{
+    el('polygon',{class:'water',points:pts([P(0,0),P(60,0),P(60,60),P(0,60)])},g);
+    const b=P(30,30,0),t=P(30,30,140),m=P(30,30,105);
+    el('polygon',{class:'spray',points:pts([[t[0]-1,t[1]],[t[0]+14,t[1]+10],[t[0]+24,t[1]+40],[t[0]+18,t[1]+75],[m[0]+3,m[1]]])},g);
+    el('polygon',{class:'jet',points:pts([[b[0]-5,b[1]],[b[0]+5,b[1]],[m[0]+2.6,m[1]],[t[0]+1.2,t[1]+2],[t[0],t[1]-2],[t[0]-1.2,t[1]+2],[m[0]-2.6,m[1]]])},g);
+  },
+  sign:[['Jet d’Eau, Geneva',40,48,'y'],['140 m high',30,86]],signAt:[0,30,165],
+  cmp:e=>heightCmp(e,140,'the Jet d’Eau fountain in Geneva (140 m)')});
+LM.bridge=landmark({name:'Chapel Bridge, Lucerne',w:204,dp:44,
+  draw:g=>{
+    const p=(a,b,c)=>P(a,b,c);
+    el('polygon',{class:'water',points:pts([p(-12,0,0),p(216,0,0),p(216,44,0),p(-12,44,0)])},g);
+    // Water Tower (Wasserturm), next to the bridge
+    box(g,118,6,0,12,12,30); pyramid(g,118,6,12,12,30,34.5);
+    // covered wooden bridge
+    box(g,0,24,1.5,204,5,4.5);
+    el('polygon',{class:'roof',points:pts([p(0,29,6),p(204,29,6),p(204,26.5,8.5),p(0,26.5,8.5)])},g);
+    el('polygon',{class:'r',points:pts([p(204,24,6),p(204,29,6),p(204,26.5,8.5)])},g);
+  },
+  sign:[['Chapel Bridge, Lucerne',40,48,'y'],['204 m long',30,86]],signAt:[0,22,50],shadows:[[118,6,12,12,34.5],[0,24,204,5,8.5]],
+  cmp:e=>e>=204
+    ? `The edge of the cube would be ${f1.format(e/204)} times as long as the Chapel Bridge in Lucerne (204 m).`
+    : `The edge of the cube would be ${pct(e/204)} of the length of the Chapel Bridge in Lucerne (204 m).`});
+LM.matter=landmark({name:'Matterhorn',w:1800,dp:1800,
+  draw:g=>{
+    // simplified shape: only the last 1’218 m, from the Hörnli hut (3’260 m) to the summit (4’478 m)
+    const w=1800,d=1800,pk=P(990,810,1218);
+    const a=P(0,d,0),b=P(w,d,0),c=P(w,0,0);
+    el('polygon',{class:'rock-l',points:pts([a,b,pk])},g);
+    el('polygon',{class:'rock-r',points:pts([c,b,pk])},g);
+    el('polygon',{class:'snow',points:pts([pk,mix(pk,a,.26),mix(pk,mix(a,b,.55),.18),mix(pk,b,.3)])},g);
+    el('polygon',{class:'snow',points:pts([pk,mix(pk,b,.3),mix(pk,mix(b,c,.5),.2),mix(pk,c,.24)])},g);
+  },
+  sign:[['Matterhorn',40,48,'y'],['last 1’218 m to the summit',30,86]],signAt:[990,810,1260],shadows:[[200,200,1400,1400,500]],
+  cmp:e=>`The cube would reach ${pct(e/1218)} of the way up the last 1’218 m of the Matterhorn, from the Hörnli hut (3’260 m) to the summit (4’478 m).`});
+LM.hb=landmark({name:'Zurich HB main hall',w:131,dp:43,
+  draw:g=>{
+    const p=(a,b,c)=>P(a,b,c);
+    box(g,0,0,0,131,43,18);
+    for(let i=11;i<131;i+=12){const a=P(i,43,3),b=P(i,43,15);el('line',{class:'win',x1:a[0],y1:a[1],x2:b[0],y2:b[1]},g);}
+    el('polygon',{class:'roof',points:pts([p(0,43,18),p(131,43,18),p(131,21.5,26),p(0,21.5,26)])},g);
+    el('polygon',{class:'r',points:pts([p(131,0,18),p(131,43,18),p(131,21.5,26)])},g);
+  },
+  sign:[['Zurich HB',40,48,'y'],['131 m long, 26 m high',30,86]],signAt:[0,21,50],shadows:[[0,0,131,43,26]],
+  cmp:(e,d)=>{const n=Math.abs(d.ice)/(131*43*26);
+    return `This ice would fill the main hall of Zurich HB (131 × 43 × 26 m, counted as a simple box) about ${n>=10?f0.format(n):f1.format(n)} times.`;}});
+LM.zhdk=landmark({name:'ZHdK, Toni-Areal',w:170,dp:90,
+  draw:g=>{
+    box(g,0,0,0,170,90,25);
+    for(let z=5;z<25;z+=5){const a=P(0,90,z),b=P(170,90,z);el('line',{class:'win',x1:a[0],y1:a[1],x2:b[0],y2:b[1]},g);}
+    box(g,140,0,25,30,30,50);
+    for(let z=30;z<75;z+=4){const a=P(140,30,z),b=P(170,30,z);el('line',{class:'win',x1:a[0],y1:a[1],x2:b[0],y2:b[1]},g);}
+  },
+  sign:[['ZHdK, Toni-Areal',40,48,'y'],['170 × 90 m, tower 75 m',30,86]],signAt:[0,45,50],shadows:[[0,0,170,90,25],[140,0,30,30,75]],
+  cmp:e=>heightCmp(e,75,'the tower of the Toni-Areal, home of the ZHdK (75 m)')});
+LM.train=landmark({name:'Bernina Express',w:118,dp:3,
+  draw:g=>{
+    // 7 panorama coaches, about 16.5 m long and 2.65 m wide each
+    for(let i=0;i<7;i++){
+      const x=i*17;
+      box(g,x,0,0.6,16.5,2.65,3.4,'tr');
+      el('polygon',{class:'twin',points:pts([P(x+1,2.65,2.2),P(x+15.5,2.65,2.2),P(x+15.5,2.65,3.8),P(x+1,2.65,3.8)])},g);
+    }
+  },
+  sign:[['Bernina Express',40,48,'y'],['7 coaches, about 115 m',30,86]],signAt:[0,1.3,28],shadows:[[0,0,118,2.65,4]],
+  cmp:e=>e>=115
+    ? `The edge of the cube would be ${f1.format(e/115)} times as long as a Bernina Express with 7 panorama coaches (about 115 m).`
+    : `The edge of the cube would be ${pct(e/115)} of the length of a Bernina Express with 7 panorama coaches (about 115 m).`});
+const LMS=Object.values(LM);
+
+// ---------- Layouts ----------
+function layoutYear(){
+  const cols=7,pos=new Map(),labels=[];
+  const A=D.filter(d=>d.year<1950),B=D.filter(d=>d.year>1950);
+  A.forEach((d,i)=>pos.set(d,{x:(i%cols)*S,y:Math.floor(i/cols)*S}));
+  const rA=Math.ceil(A.length/cols), yB=rA*S+S*0.9;
+  B.forEach((d,i)=>pos.set(d,{x:(i%cols)*S,y:yB+Math.floor(i/cols)*S}));
+  labels.push({x:30,y:0,z:rowTop(A.slice(0,cols)),text:'1885 – 1909',sub:'The first series of measurements'});
+  labels.push({x:30,y:yB,z:rowTop(B.slice(0,cols)),text:'2007 – 2026',sub:'There are no measurements for 1910 – 2006'});
+  return {pos,labels};
+}
+function layoutDecade(){
+  const pos=new Map(),labels=[];
+  [1880,1890,1900,2000,2010,2020].forEach((dec,gi)=>{
+    const ox=(gi%3)*(4*S+S*0.9), oy=Math.floor(gi/3)*(3*S+S*1.3);
+    const list=D.filter(d=>Math.floor(d.year/10)*10===dec);
+    list.forEach((d,i)=>pos.set(d,{x:ox+(i%4)*S,y:oy+Math.floor(i/4)*S}));
+    const net=list.reduce((s,d)=>s+d.ice,0);
+    labels.push({x:ox+30,y:oy,z:rowTop(list.slice(0,4)),text:`${dec}s`,sub:`${list.length} ${list.length===1?'year':'years'} measured · net loss ${mio(net)}`});
+  });
+  return {pos,labels};
+}
+function layoutLoss(){
+  const pos=new Map(),labels=[],cols=7;
+  const order=D.slice().sort((a,b)=>b.ice-a.ice);
+  order.forEach((d,i)=>pos.set(d,{x:(i%cols)*S,y:Math.floor(i/cols)*S}));
+  labels.push({x:30,y:0,z:rowTop(order.slice(0,cols)),text:'Largest loss first',sub:'The number on the ground shows the rank'});
+  return {pos,labels};
+}
+const TOTAL_MAXY=6.4*S;
+const totalPos=()=>({x:0,y:TOTAL_MAXY-TOTAL.e-0.3*S});
+function layoutTotal(){
+  // all year blocks fly into the middle of the big block and disappear
+  const pos=new Map(), t=totalPos(), E=TOTAL.e;
+  D.forEach(d=>pos.set(d,{x:t.x+E/2-S/2,y:t.y+E/2-S/2}));
+  const labels=[{x:t.x+30,y:t.y,z:E+12+SH+140,text:'All the ice in one block',sub:`${losses.length} years with a loss · 1885 – 1909 and 2007 – 2026`}];
+  return {pos,labels,maxY:TOTAL_MAXY};
+}
+const rowTop=list=>Math.max(...list.map(d=>d.e))+12+SH+140;
+const LAYOUTS={year:layoutYear,decade:layoutDecade,loss:layoutLoss,total:layoutTotal};
+
+function targets(name){
+  const L=LAYOUTS[name](); let maxY=0;
+  const tg=new Map();
+  L.pos.forEach((p,d)=>{const b=byYear[d.year];tg.set(b,{x:p.x+(S-b.e)/2,y:p.y+(S-b.e)/2});maxY=Math.max(maxY,p.y+S);});
+  if(L.maxY)maxY=L.maxY;
+  tg.set(TOTAL,totalPos());
+  // Landmarks stand in one row in front of the blocks, so no block hides them.
+  // Each gets as much room as its sign is wide, so the signs never overlap.
+  let rx=0; const ry=maxY+S*0.35;
+  for(const l of [LM.field,LM.prime,LM.gross,LM.jet,LM.bridge,LM.hb,LM.zhdk,LM.train]){
+    tg.set(l,{x:rx,y:ry}); rx+=Math.max(l.w,l.sw)+70;
+  }
+  tg.set(LM.matter,{x:S*1.6,y:-1800-S*0.9});
+  return {tg,labels:L.labels,order:[...L.pos.keys()].map(d=>byYear[d.year])};
+}
+
+let gLabels=null;
+function drawLabels(labels,instant){
+  if(gLabels){const old=gLabels;old.classList.add('out');setTimeout(()=>old.remove(),instant?0:650);}
+  gLabels=el('g',{class:'glabels'+(instant?'':' out')},gTop);
+  labels.forEach(l=>{
+    const g=el('g',{transform:`matrix(${M_LEFT},${P(l.x,l.y,l.z)})`},gLabels);
+    let t=el('text',{y:0,'font-size':120,'stroke-width':16},g);t.textContent=l.text;
+    if(l.sub){t=el('text',{y:78,'font-size':54,'stroke-width':12,class:'muted'},g);t.textContent=l.sub;}
+  });
+  if(!instant){const g=gLabels;requestAnimationFrame(()=>requestAnimationFrame(()=>g.classList.remove('out')));}
+}
+
+function place(it){
+  const p=P(it.cur.x,it.cur.y);
+  const tr=`translate(${p[0].toFixed(2)},${p[1].toFixed(2)})`;
+  it.el.setAttribute('transform',tr); it.sh.setAttribute('transform',tr);
+}
+let lastOrder='';
+function sortDepth(){
+  const s=items.slice().sort((a,b)=>(a.cur.x+a.w/2+a.cur.y+a.dp/2)-(b.cur.x+b.w/2+b.cur.y+b.dp/2));
+  const key=s.map(i=>items.indexOf(i)).join(',');
+  if(key!==lastOrder){lastOrder=key;s.forEach(i=>gItems.appendChild(i.el));}
+}
+
+// ---------- Camera ----------
+let W=innerWidth,H=innerHeight,cam={x:0,y:0,k:1},free=false,layout='year';
+function applyCam(){
+  world.setAttribute('transform',`translate(${W/2},${H/2}) scale(${cam.k}) translate(${-cam.x},${-cam.y})`);
+  for(const b of blocks){
+    b.dim.style.display = b.fs*cam.k<7 ? 'none' : '';
+    b.sign.style.display = 30*cam.k<5 && 62*cam.k<9 ? 'none' : '';
+  }
+}
+function fit(list,getPos,pad){
+  let x0=Infinity,y0=Infinity,x1=-Infinity,y1=-Infinity;
+  for(const it of list){const o=P(getPos(it).x,getPos(it).y);for(const q of it.box){const x=o[0]+q[0],y=o[1]+q[1];if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y;}}
+  const k=Math.min((W-pad.l-pad.r)/(x1-x0),(H-pad.t-pad.b)/(y1-y0));
+  return {k,x:(x0+x1)/2-((pad.l+W-pad.r)/2-W/2)/k,y:(y0+y1)/2-((pad.t+H-pad.b)/2-H/2)/k};
+}
+const overviewPad=()=>({l:24,r:W>700?84:24,t:W>700?100:130,b:70});
+const singlePad=()=>W>700?{l:40,r:Math.min(420,W-32)+56,t:100,b:80}:{l:20,r:20,t:90,b:H*0.52+30};
+const visible=it=>it===TOTAL?layout==='total':(it.kind==='block'?layout!=='total':true);
+const fitAll=(getPos=it=>it.cur)=>fit(items.filter(visible),getPos,overviewPad());
+function camLerp(a,b,t){return {x:lerp(a.x,b.x,t),y:lerp(a.y,b.y,t),k:Math.exp(lerp(Math.log(a.k),Math.log(b.k),t))};}
+
+function introCam(t){
+  const b=byYear[2022];
+  const c=P(b.cur.x+b.e,b.cur.y+b.e,b.e);
+  const k0=0.1*Math.min(W,H)/b.fs;
+  const K0={k:k0,x:c[0]-0.07*W/k0,y:c[1]-0.14*H/k0};
+  const K1=fit([b,LM.prime,LM.gross,LM.field],it=>it.cur,{l:30,r:30,t:Math.min(H*0.34,260),b:70});
+  const K2=fitAll();
+  if(t<0.12) return K0;
+  if(t<0.5) return camLerp(K0,K1,smooth((t-0.12)/0.38));
+  if(t<0.6) return K1;
+  if(t<0.95) return camLerp(K1,K2,smooth((t-0.6)/0.35));
+  return K2;
+}
+
+// ---------- Scroll / intro ----------
+const steps=[...document.querySelectorAll('.intro')], hint=document.getElementById('hint'), skip=document.getElementById('skip');
+function progress(){const m=document.documentElement.scrollHeight-innerHeight;return m>0?clamp(scrollY/m):1;}
+function onScroll(){
+  const t=progress();
+  const wasFree=free; free=t>0.985;
+  document.body.classList.toggle('free',free);
+  steps.forEach((s,i)=>s.classList.toggle('on', !free && (i===0?t<0.3:i===1?(t>=0.3&&t<0.64):t>=0.64)));
+  hint.classList.toggle('hide',t>0.04);
+  skip.textContent=free?'Watch the intro again':'Skip intro';
+  if(free&&!wasFree){cam=fitAll();applyCam();}
+  if(!free){
+    if(wasFree){closeInfo();}
+    if(layout!=='year'){document.getElementById('order').value='year';setLayout('year');}
+    if(!anim){cam=introCam(t);applyCam();}
+  }
+}
+addEventListener('scroll',onScroll,{passive:true});
+skip.addEventListener('click',()=>{
+  const top=free?0:document.documentElement.scrollHeight;
+  scrollTo({top,behavior:reduced?'auto':'smooth'});
+});
+
+// ---------- Moving things ----------
+let anim=null, home=new Map();   // home = positions of the current layout
+function animate(tg,camTo,order,dur=1300){
+  const idx=order?new Map(order.map((it,i)=>[it,i])):null;
+  for(const it of items){it.from={...it.cur};it.to={...(tg.get(it)||it.cur)};it.delay=idx&&idx.has(it)?idx.get(it)*14:0;}
+  if(reduced){
+    for(const it of items){it.cur={...it.to};place(it);}
+    sortDepth(); if(camTo&&free)cam=camTo; else if(!free)cam=introCam(progress());
+    applyCam(); anim=null; return;
+  }
+  anim={t0:performance.now(),camFrom:{...cam},camTo,dur};
+  requestAnimationFrame(tick);
+}
+function tick(now){
+  if(!anim)return;
+  const dur=anim.dur;let done=true;
+  for(const it of items){let p=(now-anim.t0-it.delay)/dur;if(p<1)done=false;p=ease(clamp(p));
+    it.cur.x=lerp(it.from.x,it.to.x,p);it.cur.y=lerp(it.from.y,it.to.y,p);place(it);}
+  sortDepth();
+  if(free&&anim.camTo){const p=ease(clamp((now-anim.t0)/(dur+400)));if(p<1)done=false;cam=camLerp(anim.camFrom,anim.camTo,p);}
+  else if(!free) cam=introCam(progress());
+  applyCam();
+  if(done)anim=null;else requestAnimationFrame(tick);
+}
+function setLayout(name,instant){
+  layout=name; svg.dataset.layout=name;
+  document.body.classList.toggle('total',name==='total');
+  const {tg,labels,order}=targets(name);
+  home=tg;
+  drawLabels(labels,instant);
+  if(instant){for(const it of items){it.cur={...tg.get(it)};place(it);}sortDepth();anim=null;return;}
+  animate(tg,free?fitAll(it=>tg.get(it)):null,order);
+}
+document.getElementById('order').addEventListener('change',e=>setLayout(e.target.value));
+
+// ---------- Single view: one block next to one random landmark ----------
+let single=null, pick=null;
+const randomLandmark=prev=>{const pool=LMS.filter(l=>l!==prev);return pool[Math.floor(Math.random()*pool.length)];};
+// Place the landmark to the right of the block, at the same depth, so the two never overlap on screen.
+function besidePos(b,lm){
+  // the gap is widened for small blocks so the two signs do not overlap
+  const p=home.get(b), e=b.e, gap=Math.max(40,e*0.3,SW+30-1.2*e-lm.dp+lm.sy);
+  const s=(gap+lm.w/2-lm.dp/2)/2;
+  return {x:p.x+e+gap-s,y:p.y-s-lm.dp};
+}
+const singleCam=tg=>fit([single,pick],it=>tg.get(it),singlePad());
+function enterSingle(it,lm){
+  if(!free)return;
+  if(single!==it)info.scrollTop=0;
+  if(single&&single!==it)single.el.classList.remove('sel');
+  const prev=pick;
+  single=it; pick=lm||randomLandmark(pick);
+  for(const b of blocks){const f=b!==it;b.el.classList.toggle('fade',f);b.sh.classList.toggle('fade',f);}
+  for(const l of LMS){const g=l!==pick;l.el.classList.toggle('gone',g);l.sh.classList.toggle('gone',g);}
+  it.el.classList.add('sel');
+  document.body.classList.add('single');
+  const tg=new Map(home), bp=besidePos(it,pick);
+  tg.set(pick,bp);
+  // The new landmark appears right next to the block instead of travelling across the map.
+  pick.cur={...bp}; place(pick);
+  // The previous landmark fades out where it stands, then goes back home unseen.
+  if(prev&&prev!==pick){
+    tg.set(prev,{...prev.cur});
+    setTimeout(()=>{if(prev!==pick&&prev.el.classList.contains('gone')){prev.cur={...home.get(prev)};place(prev);}},700);
+  }
+  animate(tg,singleCam(tg),null,900);
+  showBlock(it);
+}
+function exitSingle(){
+  if(!single)return;
+  single.el.classList.remove('sel');
+  single=null; pick=null;
+  for(const it of items){it.el.classList.remove('fade','gone');it.sh.classList.remove('fade','gone');}
+  document.body.classList.remove('single');
+  info.classList.remove('open');
+  animate(home,free?fitAll(it=>home.get(it)):null,null,900);
+}
+
+// ---------- Info box ----------
+const info=document.getElementById('info'), infobody=document.getElementById('infobody');
+function showBlock(it){
+  const d=it.d, m2=d.area*1e6;
+  const dates=`Measured from ${date(d.start)} to ${date(d.end)}`;
+  const cmp=`<div class="cmp"><p>${pick.cmp(d.e,d)}</p><button class="pill" type="button" data-act="another">Compare with another landmark ↻</button></div>`;
+  if(d.total){
+    infobody.innerHTML=`<h2 style="font-size:40px">All the ice</h2><p class="dates">${d.n} years with a loss · 1885–1909 and 2007–2026</p>
+      <dl><dt class="bigl">Ice melted in total</dt><dd class="big">${f0.format(d.ice)} m³</dd>
+      <dt>Cube edge</dt><dd>${f0.format(d.e)} m</dd>
+      <dt>As water</dt><dd>${mio(d.water)}</dd>
+      <dt>Minus the ${D.length-d.n} years with a gain</dt><dd>${mio(d.net)} net</dd></dl>
+      <p>There are no measurements for 1910–2006, so those years are not part of this block.</p>
+      ${cmp}<h3>How this was calculated</h3><div class="calc">
+      Sum of the ${d.n} years with a loss = ${f0.format(d.ice)} m³ of ice<br>
+      ∛ ${f0.format(d.ice)} m³ = ${f0.format(d.e)} m edge length</div>`;
+  }else if(d.gain){
+    infobody.innerHTML=`<h2>${d.year}</h2><p class="dates">${dates}</p>
+      <dl><dt class="bigl">Gain instead of loss</dt><dd class="big" style="color:var(--gain)">+${f0.format(-d.ice)} m³ of ice</dd>
+      <dt>Cube edge</dt><dd>${f0.format(d.e)} m</dd>
+      <dt>Mass balance</dt><dd>${signed(d.ba/1000)} m w.e.</dd>
+      <dt>Glacier area</dt><dd>${f2.format(d.area)} km²</dd></dl>
+      <p>This year, more snow stayed on the glacier than melted in summer. The glacier grew, so this block is dashed.</p>
+      ${cmp}${calc(d,m2)}`;
+  }else{
+    infobody.innerHTML=`<h2>${d.year}</h2><p class="dates">${dates}</p>
+      <dl><dt class="bigl">Ice melted</dt><dd class="big">${f0.format(d.ice)} m³</dd>
+      <dt>Cube edge</dt><dd>${f0.format(d.e)} m</dd>
+      <dt>Mass balance</dt><dd>${signed(d.ba/1000)} m w.e.</dd>
+      <dt>Glacier area</dt><dd>${f2.format(d.area)} km²</dd>
+      <dt>As water</dt><dd>${mio(d.water)}</dd>
+      <dt>Rank</dt><dd>${d.rank} of ${losses.length} years with a loss</dd></dl>
+      ${cmp}${calc(d,m2)}`;
+  }
+  info.classList.add('open');
+}
+function calc(d,m2){
+  return `<h3>How this was calculated</h3><div class="calc">
+    ${f3.format(Math.abs(d.ba/1000))} m × ${f0.format(m2)} m² = ${f0.format(Math.abs(d.water))} m³ of water<br>
+    ${f0.format(Math.abs(d.water))} m³ × 1000 / 900 = ${f0.format(Math.abs(d.ice))} m³ of ice<br>
+    ∛ ${f0.format(Math.abs(d.ice))} m³ = ${f0.format(d.e)} m edge length</div>`;
+}
+function showAbout(){
+  exitSingle();
+  const total=losses.reduce((s,d)=>s+d.ice,0);
+  infobody.innerHTML=`<h2 style="font-size:34px">How this was calculated</h2>
+    <p><b>Mass balance:</b> Every year, GLAMOS measures how much ice the glacier loses or gains. The value is a layer of water in metres (m w.e., metres of water equivalent), spread evenly over the whole glacier.</p>
+    <p><b>1.</b> Mass balance × glacier area of that year = volume of water.<br>
+    <b>2.</b> Water weighs 1000 kg/m³, ice 900 kg/m³. So: volume of water × 1000 / 900 = volume of ice.<br>
+    <b>3.</b> The edge of the cube is the cube root of the volume of ice.</p>
+    <p><b>Measured years:</b> 1885–1909 and 2007–2026, ${D.length} years in total. There are no annual measurements for 1910–2006. Across all ${losses.length} years with a loss, ${mio(total)} of ice melted.</p>
+    <p><b>Source:</b> GLAMOS (2026). Swiss Glacier Mass Balance, release 2026, Glacier Monitoring Switzerland, doi:10.18750/massbalance.2026.r2026. File “massbalance_observation”, Rhône Glacier (B43-03).</p>
+    <p class="sum">The landmarks use approximate, publicly known measurements, not GLAMOS data: Prime Tower 126 m, Grossmünster 62 m to the tower tips, football pitch 105 × 68 m, Jet d’Eau 140 m, Chapel Bridge 204 m long, Zurich HB main hall 131 × 43 × 26 m, ZHdK Toni-Areal 170 × 90 m with a 75 m tower (simplified shape), Bernina Express with 7 panorama coaches of about 16.5 m each (trains vary in length). The Matterhorn shows only its last 1’218 m, from the Hörnli hut (3’260 m) to the summit (4’478 m), in a simplified shape. The grid on the ground is 100 m.</p>`;
+  info.classList.add('open');
+}
+function closeInfo(){if(single)exitSingle();else info.classList.remove('open');}
+infobody.addEventListener('click',e=>{if(e.target.closest('[data-act="another"]')&&single)enterSingle(single,randomLandmark(pick));});
+document.getElementById('close').addEventListener('click',closeInfo);
+document.getElementById('back').addEventListener('click',exitSingle);
+document.getElementById('about').addEventListener('click',showAbout);
+addEventListener('keydown',e=>{if(e.key==='Escape')closeInfo();});
+
+// ---------- Drag, click, zoom ----------
+let drag=null;
+svg.addEventListener('pointerdown',e=>{drag={x:e.clientX,y:e.clientY,cx:cam.x,cy:cam.y,moved:false,id:e.pointerId};});
+svg.addEventListener('pointermove',e=>{
+  if(!drag||!free)return;
+  const dx=e.clientX-drag.x,dy=e.clientY-drag.y;
+  if(!drag.moved&&Math.hypot(dx,dy)>5){drag.moved=true;document.body.classList.add('dragging');try{svg.setPointerCapture(drag.id);}catch(_){}}
+  if(drag.moved){cam.x=drag.cx-dx/cam.k;cam.y=drag.cy-dy/cam.k;applyCam();}
+});
+svg.addEventListener('pointerup',e=>{
+  if(drag&&!drag.moved){
+    const t=e.target.closest&&e.target.closest('.block');
+    const it=t&&blocks.find(b=>b.el===t);
+    if(it)enterSingle(it);
+    else if(single&&!(e.target.closest&&e.target.closest('.lm')))exitSingle();
+  }
+  drag=null;document.body.classList.remove('dragging');
+});
+svg.addEventListener('pointercancel',()=>{drag=null;document.body.classList.remove('dragging');});
+function zoomBy(f){
+  const from={...cam},to={...cam,k:cam.k*f};const t0=performance.now();
+  (function z(now){const p=ease(clamp((now-t0)/350));cam=camLerp(from,to,p);applyCam();if(p<1)requestAnimationFrame(z);})(t0);
+}
+const fitNow=()=>single?fit([single,pick],it=>it.cur,singlePad()):fitAll();
+document.getElementById('zin').addEventListener('click',()=>zoomBy(1.5));
+document.getElementById('zout').addEventListener('click',()=>zoomBy(1/1.5));
+document.getElementById('zfit').addEventListener('click',()=>{const from={...cam},to=fitNow(),t0=performance.now();
+  (function z(now){const p=ease(clamp((now-t0)/600));cam=camLerp(from,to,p);applyCam();if(p<1)requestAnimationFrame(z);})(t0);});
+
+addEventListener('resize',()=>{W=innerWidth;H=innerHeight;cam=free?fitNow():introCam(progress());applyCam();});
+
+// ---------- Start ----------
+setLayout('year',true);
+onScroll();
+cam=free?fitAll():introCam(progress());applyCam();
+</script>
+
+</body>
+</html>
